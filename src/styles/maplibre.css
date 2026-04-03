@@ -9,11 +9,16 @@
 .maplibregl-ctrl-group button:hover { background: var(--surface) !important; }
 .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1) brightness(0.8); }
 
-/* Attribution + logo — always readable on any basemap */
+/* Attribution — bottom-left so it doesn't overlap info icon */
 .maplibregl-ctrl-attrib {
   background: rgba(0,0,0,0.45) !important; color: #aaa !important;
-  font-size: 0.5rem !important; border-radius: 3px;
+  font-size: 0.45rem !important; border-radius: 3px;
   backdrop-filter: blur(4px); padding: 1px 5px !important;
 }
 .maplibregl-ctrl-attrib a { color: #bbb !important; }
 .maplibregl-ctrl-logo { opacity: 0.5; }
+
+/* Move the default bottom-right attribution/logo to bottom-left */
+.maplibregl-ctrl-bottom-right {
+  left: 50px !important; right: auto !important; bottom: 4px !important;
+}

@@ -6,7 +6,6 @@
   #sidebar.sidebar--collapsed { transform: translateX(240px); }
 
   body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
-  body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right,
   body:has(#sidebar:not(.sidebar--collapsed)) .info-btn {
     right: 256px !important;
   }
@@ -61,13 +60,10 @@
   /* No sidebar shift on mobile — everything stays put */
   body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
   body:has(#sidebar:not(.sidebar--collapsed)) .info-btn,
-  body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right {
-    right: 8px !important;
-  }
-
-  /* Zoom + scale/attribution — same height, above collapsed sheet */
+  /* Zoom — above collapsed sheet */
   .maplibregl-ctrl-bottom-left { left: 8px !important; bottom: 36px !important; }
-  .maplibregl-ctrl-bottom-right { right: 8px !important; bottom: 36px !important; }
+  /* Attribution — bottom-left on mobile too */
+  .maplibregl-ctrl-bottom-right { left: 50px !important; right: auto !important; bottom: 36px !important; }
 
   /* Intro — smaller text */
   .intro-content { max-width: 320px; padding: 0 16px; }
