@@ -193,6 +193,24 @@ function buildInfoButton(): HTMLElement {
 }
 
 function buildAboutModal(): HTMLElement {
+  /* Authors */
+  const authorsData: [string, string, string][] = [
+    ['Fred Omengo', 'Lead Researcher', 'Turkana Basin Institute \u00B7 Wildlife Research and Training Institute'],
+    ['Sospecter Njeru', 'Co-Investigator', 'Kenya Medical Research Institute'],
+    ['Julien Ayroles', 'Principal Investigator', 'UC Berkeley \u00B7 Turkana Basin Institute'],
+    ['Elizabeth Niespolo', 'Corresponding Author', 'Department of Geosciences'],
+  ];
+
+  const authorsList = el('div', { className: 'authors-list' },
+    ...authorsData.map(([name, role, affil]) =>
+      el('div', { className: 'author-card' },
+        el('strong', {}, name),
+        el('span', { className: 'author-role' }, role),
+        el('span', { className: 'author-affil' }, affil),
+      ),
+    ),
+  );
+
   /* Source types */
   const sourceTypes: [string, string][] = [
     ['#1b9e77', 'Deep Borehole, Solar (DBH solar) \u2014 n=90'],
@@ -216,6 +234,8 @@ function buildAboutModal(): HTMLElement {
     el('p', { className: 'about-description' },
       'Interactive map analyzing 152 water sources across Turkana County, Kenya for 48 physical-chemical parameters.',
     ),
+    el('h3', {}, 'Authors'),
+    authorsList,
     el('h3', {}, 'Data'),
     el('p', {},
       '152 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against WHO Guidelines for Drinking-water Quality and Kenya Bureau of Standards KS 459-1:2007.',
