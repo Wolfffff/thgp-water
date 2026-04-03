@@ -151,14 +151,24 @@ function runTour(map: Map): void {
     if (step.action) step.action(map, _setParam);
 
     const prevHadHighlight = highlight.style.opacity === '1';
-
     const isMobile = window.innerWidth <= 640;
 
-    if (step.highlight && !isMobile) {
-      // Desktop: highlight the target element
+    if (step.highlight) {
+      // On mobile: open the drawer for sidebar-targeted steps
+      if (isMobile) {
+        const sidebar = document.querySelector('#sidebar');
+        sidebar?.classList.remove('sidebar--collapsed');
+        // Scroll the target into view inside the drawer
+        setTimeout(() => {
+          const target = $(step.highlight!);
+          target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 350);
+      }
+
       backdrop.style.opacity = '0';
       if (!prevHadHighlight) highlight.style.opacity = '0';
 
+      // Wait for drawer/sidebar animation then position highlight
       setTimeout(() => {
         const target = $(step.highlight!);
         if (target) {
@@ -171,9 +181,12 @@ function runTour(map: Map): void {
             highlight.style.opacity = '1';
           }
         }
-      }, prevHadHighlight ? 50 : 400);
+      }, prevHadHighlight ? 100 : 500);
     } else {
-      // No highlight — map is the focus, no dimming
+      // No highlight — map is the focus, close drawer on mobile
+      if (isMobile) {
+        document.querySelector('#sidebar')?.classList.add('sidebar--collapsed');
+      }
       highlight.style.opacity = '0';
       backdrop.style.opacity = '0';
     }
