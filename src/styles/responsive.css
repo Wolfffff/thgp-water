@@ -59,7 +59,10 @@
 
   /* No sidebar shift on mobile — everything stays put */
   body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
-  body:has(#sidebar:not(.sidebar--collapsed)) .info-btn,
+  body:has(#sidebar:not(.sidebar--collapsed)) .info-btn {
+    right: 8px !important; top: 8px !important;
+  }
+
   /* Zoom — above collapsed sheet */
   .maplibregl-ctrl-bottom-left { left: 8px !important; bottom: 36px !important; }
   .maplibregl-ctrl-bottom-right { right: 8px !important; bottom: 36px !important; }
