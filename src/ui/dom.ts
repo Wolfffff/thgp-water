@@ -195,10 +195,10 @@ function buildInfoButton(): HTMLElement {
 function buildAboutModal(): HTMLElement {
   /* Authors */
   const authorsData: [string, string, string][] = [
-    ['Fred Omengo', 'Lead Researcher', 'Turkana Basin Institute \u00B7 Wildlife Research and Training Institute'],
+    ['Fred Omengo', 'Lead Researcher', 'Princeton University \u00B7 Turkana Basin Institute \u00B7 Wildlife Research and Training Institute'],
     ['Sospecter Njeru', 'Co-Investigator', 'Kenya Medical Research Institute'],
     ['Julien Ayroles', 'Principal Investigator', 'UC Berkeley \u00B7 Turkana Basin Institute'],
-    ['Elizabeth Niespolo', 'Corresponding Author', 'Department of Geosciences'],
+    ['Elizabeth Niespolo', 'Corresponding Author', 'Princeton University \u00B7 fo5058@princeton.edu'],
   ];
 
   const authorsList = el('div', { className: 'authors-list' },
