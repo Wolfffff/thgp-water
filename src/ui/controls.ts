@@ -220,26 +220,65 @@ export function initSidebarToggle(): void {
     sidebar.classList.toggle('sidebar--collapsed');
   });
 
-  // Swipe to collapse: right on desktop, down on mobile bottom sheet
-  let startX = 0;
+  // Smooth drag to open/close on touch
   let startY = 0;
+  let startX = 0;
+  let dragging = false;
+  let sidebarHeight = 0;
+
   sidebar.addEventListener('touchstart', (e) => {
-    startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+    dragging = true;
+    sidebarHeight = sidebar.offsetHeight;
+    sidebar.style.transition = 'none'; // disable CSS transition during drag
   }, { passive: true });
 
-  sidebar.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - startX;
-    const dy = e.changedTouches[0].clientY - startY;
+  sidebar.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
     const isMobile = window.innerWidth <= 640;
 
     if (isMobile) {
-      // Swipe down > 40px = collapse bottom sheet
-      if (dy > 40 && Math.abs(dx) < 80) {
+      // Bottom sheet: drag up/down
+      const dy = e.touches[0].clientY - startY;
+      const isCollapsed = sidebar.classList.contains('sidebar--collapsed');
+      if (isCollapsed) {
+        // Dragging up from collapsed — show proportionally
+        const show = Math.max(0, Math.min(-dy, sidebarHeight));
+        sidebar.style.transform = `translateY(calc(100% - 28px - ${show}px))`;
+      } else {
+        // Dragging down from open — hide proportionally
+        if (dy > 0) {
+          sidebar.style.transform = `translateY(${dy}px)`;
+        }
+      }
+    } else {
+      // Desktop: drag right to collapse
+      const dx = e.touches[0].clientX - startX;
+      if (dx > 0 && !sidebar.classList.contains('sidebar--collapsed')) {
+        sidebar.style.transform = `translateX(${dx}px)`;
+      }
+    }
+  }, { passive: true });
+
+  sidebar.addEventListener('touchend', (e) => {
+    if (!dragging) return;
+    dragging = false;
+    sidebar.style.transition = ''; // restore CSS transition
+    sidebar.style.transform = ''; // clear inline transform
+
+    const dy = e.changedTouches[0].clientY - startY;
+    const dx = e.changedTouches[0].clientX - startX;
+    const isMobile = window.innerWidth <= 640;
+
+    if (isMobile) {
+      const isCollapsed = sidebar.classList.contains('sidebar--collapsed');
+      if (isCollapsed && dy < -40) {
+        sidebar.classList.remove('sidebar--collapsed');
+      } else if (!isCollapsed && dy > 40) {
         sidebar.classList.add('sidebar--collapsed');
       }
     } else {
-      // Swipe right > 50px = collapse right sidebar
       if (dx > 50 && Math.abs(dy) < 80) {
         sidebar.classList.add('sidebar--collapsed');
       }
