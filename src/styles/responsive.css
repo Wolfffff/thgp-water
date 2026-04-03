@@ -77,11 +77,11 @@
   .intro-stat-number { font-size: 1.8rem; }
   .intro-meta { flex-direction: column; gap: 4px; }
 
-  /* Tour card — mid screen on mobile, above bottom sheet */
+  /* Tour card — top of screen on mobile so map content is visible below */
   .tour-card {
     width: calc(100vw - 24px); max-width: none;
-    bottom: auto; top: 50%; left: 12px;
-    transform: translateY(-50%);
+    bottom: auto; top: 56px; left: 12px;
+    transform: none;
   }
 
   /* Modals — bottom sheets */

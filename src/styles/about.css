@@ -4,10 +4,10 @@
   width: 34px; height: 34px;
   background: var(--panel); backdrop-filter: blur(16px);
   border: 1px solid var(--border); border-radius: 50%;
-  color: var(--muted); font: italic 600 0.85rem/1 var(--serif);
+  color: var(--muted); font: italic 600 0.9rem/1 var(--serif);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all var(--ease), right 0.3s ease;
-  padding-top: 1px; /* optical center for italic i */
+  padding-right: 2px; /* shift italic i left to center optically */
 }
 .info-btn:hover { color: var(--orange); border-color: var(--orange); }
 

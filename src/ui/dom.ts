@@ -188,8 +188,7 @@ function buildSidebar(): HTMLElement {
 }
 
 function buildInfoButton(): HTMLElement {
-  const btn = el('button', { id: 'info-btn', className: 'info-btn', title: 'About this map' }, 'i');
-  return btn;
+  return el('button', { id: 'info-btn', className: 'info-btn', title: 'About this map' }, 'i');
 }
 
 function buildAboutModal(): HTMLElement {
