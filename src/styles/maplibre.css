@@ -18,8 +18,11 @@
 .maplibregl-ctrl-attrib a { color: #bbb !important; }
 .maplibregl-ctrl-logo { opacity: 0.5; }
 
+/* Bottom-right: attribution + scale in a horizontal row */
 .maplibregl-ctrl-bottom-right {
   right: 16px !important; bottom: 4px !important;
+  display: flex !important; flex-direction: row-reverse !important;
+  align-items: center !important; gap: 6px !important;
   transition: right 0.3s ease;
 }
 @media (min-width: 641px) {

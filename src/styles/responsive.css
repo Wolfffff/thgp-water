@@ -50,8 +50,8 @@
   /* Info button */
   .info-btn { top: 8px; right: 8px; width: 28px; height: 28px; font-size: 0.8rem; }
 
-  /* Basemap picker — behind bottom sheet */
-  .basemap-picker { bottom: 82px; right: 8px; z-index: 5; }
+  /* Basemap picker — above scale/attribution row, behind bottom sheet */
+  .basemap-picker { bottom: 56px; right: 8px; z-index: 5; }
   .basemap-option { width: 44px; }
   .basemap-thumb { width: 36px; height: 36px; }
   .basemap-label { font-size: 0.4rem; }
