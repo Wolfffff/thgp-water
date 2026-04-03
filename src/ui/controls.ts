@@ -217,21 +217,35 @@ export function initSidebarToggle(): void {
   if (!toggle || !sidebar) return;
 
   toggle.addEventListener('click', () => {
-    sidebar.classList.toggle('sidebar--collapsed');
+    const isMobile = window.innerWidth <= 640;
+    if (isMobile) {
+      // Toggle between collapsed and half-screen
+      if (sidebar.classList.contains('sidebar--collapsed')) {
+        sidebar.classList.remove('sidebar--collapsed');
+        sidebar.style.maxHeight = '45vh';
+        sidebar.style.transform = '';
+      } else {
+        sidebar.classList.add('sidebar--collapsed');
+        sidebar.style.maxHeight = '';
+        sidebar.style.transform = '';
+      }
+    } else {
+      sidebar.classList.toggle('sidebar--collapsed');
+    }
   });
 
-  // Smooth drag to open/close on touch
+  // Mobile: smooth drag to resize bottom sheet
   let startY = 0;
   let startX = 0;
   let dragging = false;
-  let sidebarHeight = 0;
+  let startHeight = 0;
 
   sidebar.addEventListener('touchstart', (e) => {
     startY = e.touches[0].clientY;
     startX = e.touches[0].clientX;
     dragging = true;
-    sidebarHeight = sidebar.offsetHeight;
-    sidebar.style.transition = 'none'; // disable CSS transition during drag
+    startHeight = sidebar.getBoundingClientRect().height;
+    sidebar.style.transition = 'none';
   }, { passive: true });
 
   sidebar.addEventListener('touchmove', (e) => {
@@ -239,21 +253,12 @@ export function initSidebarToggle(): void {
     const isMobile = window.innerWidth <= 640;
 
     if (isMobile) {
-      // Bottom sheet: drag up/down
       const dy = e.touches[0].clientY - startY;
-      const isCollapsed = sidebar.classList.contains('sidebar--collapsed');
-      if (isCollapsed) {
-        // Dragging up from collapsed — show proportionally
-        const show = Math.max(0, Math.min(-dy, sidebarHeight));
-        sidebar.style.transform = `translateY(calc(100% - 28px - ${show}px))`;
-      } else {
-        // Dragging down from open — hide proportionally
-        if (dy > 0) {
-          sidebar.style.transform = `translateY(${dy}px)`;
-        }
-      }
+      const newHeight = Math.max(28, Math.min(startHeight - dy, window.innerHeight * 0.8));
+      sidebar.classList.remove('sidebar--collapsed');
+      sidebar.style.maxHeight = `${newHeight}px`;
+      sidebar.style.transform = 'none';
     } else {
-      // Desktop: drag right to collapse
       const dx = e.touches[0].clientX - startX;
       if (dx > 0 && !sidebar.classList.contains('sidebar--collapsed')) {
         sidebar.style.transform = `translateX(${dx}px)`;
@@ -264,21 +269,25 @@ export function initSidebarToggle(): void {
   sidebar.addEventListener('touchend', (e) => {
     if (!dragging) return;
     dragging = false;
-    sidebar.style.transition = ''; // restore CSS transition
-    sidebar.style.transform = ''; // clear inline transform
-
-    const dy = e.changedTouches[0].clientY - startY;
-    const dx = e.changedTouches[0].clientX - startX;
+    sidebar.style.transition = '';
     const isMobile = window.innerWidth <= 640;
 
     if (isMobile) {
-      const isCollapsed = sidebar.classList.contains('sidebar--collapsed');
-      if (isCollapsed && dy < -40) {
-        sidebar.classList.remove('sidebar--collapsed');
-      } else if (!isCollapsed && dy > 40) {
+      const finalHeight = sidebar.getBoundingClientRect().height;
+      if (finalHeight < 60) {
+        // Very small — fully collapse
         sidebar.classList.add('sidebar--collapsed');
+        sidebar.style.maxHeight = '';
+        sidebar.style.transform = '';
+      } else {
+        // Keep at current height
+        sidebar.style.maxHeight = `${finalHeight}px`;
+        sidebar.style.transform = 'none';
       }
     } else {
+      sidebar.style.transform = '';
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
       if (dx > 50 && Math.abs(dy) < 80) {
         sidebar.classList.add('sidebar--collapsed');
       }
