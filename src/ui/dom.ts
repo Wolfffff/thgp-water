@@ -184,7 +184,7 @@ function buildSidebar(): HTMLElement {
     actions,
   );
 
-  return el('div', { id: 'sidebar', className: 'sidebar' }, toggle, content);
+  return el('div', { id: 'sidebar', className: 'sidebar sidebar--collapsed' }, toggle, content);
 }
 
 function buildInfoButton(): HTMLElement {
