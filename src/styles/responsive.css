@@ -30,12 +30,12 @@
   #title-bar h1 { font-size: 0.85rem; }
   #title-bar .princeton-wordmark { font-size: 0.45rem; }
 
-  /* Info button */
-  .info-btn { top: 8px; right: 8px; width: 28px; height: 28px; font-size: 0.8rem; }
+  /* Info button — below title bar on mobile */
+  .info-btn { top: 56px; right: 8px; width: 28px; height: 28px; font-size: 0.8rem; }
 
-  /* Basemap picker — horizontal, smaller */
+  /* Basemap picker — top right corner on mobile */
   .basemap-picker {
-    bottom: auto; top: 8px; right: 44px;
+    bottom: auto; top: 8px; right: 8px;
     flex-direction: row; gap: 4px;
   }
   .basemap-option { width: 44px; }
