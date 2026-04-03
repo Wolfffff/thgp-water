@@ -12,6 +12,7 @@ import './styles/about.css';
 import './styles/walkthrough.css';
 import './styles/maplibre.css';
 import './styles/basemap-picker.css';
+import './styles/responsive.css';
 
 import { MAP_CENTER, DEFAULT_ZOOM, MIN_ZOOM, MAX_ZOOM, MAX_BOUNDS } from './map/config';
 import { getInitialStyle } from './map/styles';

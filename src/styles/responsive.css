@@ -1,0 +1,106 @@
+/* ── Mobile & tablet responsive styles ── */
+
+/* Tablets and small desktops */
+@media (max-width: 900px) {
+  #sidebar { width: 240px; }
+  #sidebar.sidebar--collapsed { transform: translateX(240px); }
+
+  body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
+  body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right,
+  body:has(#sidebar:not(.sidebar--collapsed)) .info-btn {
+    right: 256px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  /* Sidebar becomes a bottom sheet */
+  #sidebar {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: auto; max-height: 55vh;
+    border-left: none; border-top: 1px solid var(--border);
+    border-radius: 12px 12px 0 0;
+    overflow-y: auto;
+  }
+  #sidebar.sidebar--collapsed { transform: translateY(calc(100% - 32px)); }
+
+  /* Toggle moves to top-center of sidebar */
+  .sidebar-toggle {
+    left: 50%; top: -16px; transform: translateX(-50%);
+    width: 48px; height: 20px;
+    border-radius: 6px 6px 0 0;
+    border: 1px solid var(--border); border-bottom: none;
+  }
+  .sidebar-toggle-icon { transform: rotate(90deg) !important; }
+  #sidebar.sidebar--collapsed .sidebar-toggle-icon { transform: rotate(-90deg) !important; }
+
+  .sidebar-content {
+    padding: 16px 16px 24px; gap: 14px;
+    max-height: 50vh; overflow-y: auto;
+  }
+
+  /* Title bar — smaller */
+  #title-bar {
+    top: 8px; left: 8px;
+    padding: 8px 10px;
+  }
+  #title-bar h1 { font-size: 0.85rem; }
+  #title-bar .princeton-wordmark { font-size: 0.45rem; }
+
+  /* Info button */
+  .info-btn { top: 8px; right: 8px; width: 28px; height: 28px; font-size: 0.8rem; }
+
+  /* Basemap picker — horizontal, smaller */
+  .basemap-picker {
+    bottom: auto; top: 8px; right: 44px;
+    flex-direction: row; gap: 4px;
+  }
+  .basemap-option { width: 44px; }
+  .basemap-thumb { width: 36px; height: 36px; }
+  .basemap-label { font-size: 0.4rem; }
+  .basemap-stack-label { display: none; }
+
+  /* Stacked state adjustments for horizontal layout */
+  .basemap--stacked .basemap-option:not(.basemap-option--active) {
+    transform: translate(4px, 0); bottom: auto; right: auto;
+  }
+
+  /* Layers stack — don't shift for sidebar on mobile */
+  body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
+  body:has(#sidebar:not(.sidebar--collapsed)) .info-btn {
+    right: 8px !important; top: 8px !important;
+  }
+  body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right {
+    right: 8px !important;
+  }
+
+  /* Zoom controls — smaller */
+  .maplibregl-ctrl-bottom-left { left: 8px !important; bottom: 16px !important; }
+  .maplibregl-ctrl-bottom-right { right: 8px !important; bottom: 4px !important; }
+
+  /* Intro — smaller text */
+  .intro-content { max-width: 320px; padding: 0 16px; }
+  .intro-content h1 { font-size: 1.6rem; }
+  .intro-subtitle { font-size: 0.85rem; }
+  .intro-stats { gap: 28px; margin: 20px 0; }
+  .intro-stat-number { font-size: 1.8rem; }
+  .intro-meta { flex-direction: column; gap: 4px; }
+
+  /* Tour card — full width at bottom */
+  .tour-card { width: calc(100vw - 24px); bottom: 16px; left: 12px; transform: none; }
+
+  /* Details modal — full width */
+  #details-panel, #about-panel { width: 95%; max-width: none; padding: 20px 16px; }
+  .details-stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Popups — full width */
+  .maplibregl-popup-content { min-width: 200px; max-width: 280px; }
+}
+
+/* Very small screens */
+@media (max-width: 380px) {
+  .intro-content h1 { font-size: 1.3rem; }
+  .intro-stats { gap: 20px; }
+  .intro-stat-number { font-size: 1.5rem; }
+  #title-bar h1 { font-size: 0.75rem; }
+}
