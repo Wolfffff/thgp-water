@@ -1,6 +1,6 @@
 /* Basemap picker — stacked tiles that expand left on click */
 .basemap-picker {
-  position: fixed; bottom: 24px; right: 16px; z-index: 10;
+  position: fixed; bottom: 48px; right: 16px; z-index: 10;
   display: flex; flex-direction: row-reverse; align-items: flex-end; gap: 6px;
   transition: right 0.3s ease;
 }
@@ -26,13 +26,8 @@
 }
 .basemap-option--active .basemap-label { color: var(--orange); }
 
-/* "Layers" label */
-.basemap-stack-label {
-  font: 500 0.55rem/1 var(--sans); color: var(--muted);
-  text-align: center; letter-spacing: 0.03em;
-  position: absolute; bottom: -14px; left: 0; right: 0;
-  transition: opacity 0.2s ease; pointer-events: none;
-}
+/* "Layers" label — hidden */
+.basemap-stack-label { display: none; }
 
 /* ── Stacked state ── visual stack with peek-behind tiles ── */
 .basemap--stacked {
