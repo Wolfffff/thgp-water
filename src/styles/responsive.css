@@ -62,8 +62,7 @@
   body:has(#sidebar:not(.sidebar--collapsed)) .info-btn,
   /* Zoom — above collapsed sheet */
   .maplibregl-ctrl-bottom-left { left: 8px !important; bottom: 36px !important; }
-  /* Attribution — bottom-left on mobile too */
-  .maplibregl-ctrl-bottom-right { left: 50px !important; right: auto !important; bottom: 36px !important; }
+  .maplibregl-ctrl-bottom-right { right: 8px !important; bottom: 36px !important; }
 
   /* Intro — smaller text */
   .intro-content { max-width: 320px; padding: 0 16px; }
