@@ -1,0 +1,59 @@
+/* ── Legend ── inside sidebar as a section ── */
+
+.legend-section { padding-top: 0; }
+
+.legend-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 8px;
+}
+.legend-header h4 {
+  font: 600 0.72rem/1 var(--sans);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text);
+}
+.legend-toggle {
+  background: none; border: none; color: var(--dim);
+  cursor: pointer; font-size: 0.9rem; line-height: 1; padding: 2px;
+}
+.legend-toggle:hover { color: var(--text); }
+
+#legend.legend--collapsed .legend-body,
+.legend-section.legend--collapsed .legend-body { display: none; }
+
+.legend-body { display: flex; flex-direction: column; gap: 6px; }
+
+/* Gradient scale bar */
+.legend-scale-bar {
+  height: 12px; border-radius: 3px; width: 100%;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.legend-ticks {
+  position: relative; height: 14px; margin-top: 3px;
+  font: 500 0.68rem/1 var(--sans); color: var(--muted);
+}
+.legend-tick {
+  position: absolute; transform: translateX(-50%);
+}
+.legend-labels {
+  display: flex; justify-content: space-between;
+  font: 600 0.7rem/1 var(--sans);
+  margin-top: 2px;
+}
+
+.legend-item {
+  display: flex; align-items: center; gap: 7px;
+  font: 400 0.75rem/1.2 var(--sans); color: var(--muted);
+}
+.legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.legend-threshold {
+  font: 500 0.72rem/1.3 var(--sans); color: var(--orange);
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+#legend-source-types {
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 3px;
+}

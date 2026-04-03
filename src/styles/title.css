@@ -1,0 +1,30 @@
+/* ── Title bar ── top-left overlay ── */
+
+#title-bar {
+  position: absolute; top: 16px; left: 16px; z-index: 10;
+  background: var(--panel); backdrop-filter: blur(16px);
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 10px 14px;
+  animation: fadeUp 0.5s ease 0.2s backwards;
+}
+#title-bar .princeton-wordmark {
+  font-size: 0.55rem; letter-spacing: 0.2em;
+  display: block; margin-bottom: 2px; opacity: 0.8;
+}
+#title-bar h1 {
+  font: 400 1rem/1.2 var(--serif);
+  color: #fff;
+}
+
+/* Hide UI elements while intro is showing */
+body.intro-active #title-bar,
+body.intro-active #sidebar,
+body.intro-active .basemap-picker,
+body.intro-active .maplibregl-ctrl-bottom-left,
+body.intro-active .maplibregl-ctrl-bottom-right {
+  opacity: 0 !important; pointer-events: none !important;
+}
+/* Fade in after intro */
+#title-bar, #sidebar, .basemap-picker {
+  transition: opacity 0.5s ease;
+}

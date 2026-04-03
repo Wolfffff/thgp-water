@@ -1,0 +1,102 @@
+/* Basemap picker — stacked tiles that expand left on click */
+.basemap-picker {
+  position: fixed; bottom: 52px; right: 16px; z-index: 10;
+  display: flex; flex-direction: row-reverse; align-items: flex-end; gap: 6px;
+  transition: right 0.3s ease;
+}
+
+.basemap-option {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 3px; background: var(--panel); backdrop-filter: blur(16px);
+  border: 2px solid transparent; border-radius: 6px;
+  cursor: pointer; width: 58px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.basemap-option:hover { border-color: rgba(255,255,255,0.15); }
+.basemap-option--active { border-color: var(--orange); }
+
+.basemap-thumb {
+  width: 48px; height: 48px; border-radius: 3px;
+  object-fit: cover; display: block; pointer-events: none;
+}
+.basemap-label {
+  font: 500 0.5rem/1 var(--sans); color: var(--muted);
+  pointer-events: none; transition: opacity 0.2s ease;
+}
+.basemap-option--active .basemap-label { color: var(--orange); }
+
+/* "Layers" label */
+.basemap-stack-label {
+  font: 500 0.55rem/1 var(--sans); color: var(--muted);
+  text-align: center; letter-spacing: 0.03em;
+  position: absolute; bottom: -14px; left: 0; right: 0;
+  transition: opacity 0.2s ease; pointer-events: none;
+}
+
+/* ── Stacked state ── visual stack with peek-behind tiles ── */
+.basemap--stacked {
+  position: fixed; /* keep fixed positioning */
+  /* stack is a single column, active on top */
+}
+.basemap--stacked .basemap-option--active {
+  z-index: 3; position: relative;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.basemap--stacked .basemap-option:not(.basemap-option--active) {
+  position: absolute; bottom: 0; right: 0;
+  pointer-events: none;
+}
+/* First inactive — peek out behind, offset */
+.basemap--stacked .basemap-option:not(.basemap-option--active):first-child,
+.basemap--stacked .basemap-option:not(.basemap-option--active):nth-child(2) {
+  transform: translate(-4px, -5px); z-index: 2; opacity: 0.5;
+}
+.basemap--stacked .basemap-option:not(.basemap-option--active):last-of-type {
+  transform: translate(-8px, -10px); z-index: 1; opacity: 0.3;
+}
+/* But if first child IS active, adjust which ones peek */
+.basemap--stacked .basemap-option:nth-child(2):not(.basemap-option--active) {
+  transform: translate(-4px, -5px); z-index: 2; opacity: 0.5;
+}
+.basemap--stacked .basemap-option:nth-child(3):not(.basemap-option--active) {
+  transform: translate(-8px, -10px); z-index: 1; opacity: 0.3;
+}
+.basemap--stacked .basemap-label { opacity: 0; }
+
+/* ── Expanded state ── tiles slide out horizontally to the left ── */
+.basemap-picker:not(.basemap--stacked) .basemap-option {
+  opacity: 1; position: relative;
+  pointer-events: auto; transform: none;
+}
+/* Hide label when expanded */
+.basemap-picker:not(.basemap--stacked) .basemap-stack-label { opacity: 0; }
+
+/* Zoom controls — bottom-left */
+.maplibregl-ctrl-bottom-left {
+  left: 16px !important; bottom: 24px !important;
+}
+
+/* Scale bar — always readable on any basemap */
+.maplibregl-ctrl-scale {
+  background: rgba(0,0,0,0.5) !important;
+  color: #ccc !important; border-color: #999 !important;
+  font: 500 0.55rem/1 var(--sans) !important;
+  padding: 2px 8px !important; border-radius: 3px !important;
+  margin: 0 !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Attribution — bottom row */
+.maplibregl-ctrl-bottom-right {
+  bottom: 6px !important; right: 16px !important;
+  display: flex; flex-direction: row-reverse; align-items: center; gap: 6px;
+  transition: right 0.3s ease;
+}
+
+/* Shift right-side elements when sidebar is open */
+body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
+body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right,
+body:has(#sidebar:not(.sidebar--collapsed)) .info-btn {
+  right: 296px !important;
+}

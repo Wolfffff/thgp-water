@@ -1,0 +1,28 @@
+/* Popup — MapLibre overrides + parameter bars */
+
+.maplibregl-popup-content { background: var(--panel-solid) !important; border: 1px solid var(--border) !important; border-radius: var(--r) !important; padding: 0 !important; color: var(--text) !important; font-family: var(--sans) !important; min-width: 260px; max-width: 320px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important; }
+.maplibregl-popup-tip { border-top-color: var(--panel-solid) !important; }
+.maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: var(--panel-solid) !important; }
+.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--panel-solid) !important; }
+.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--panel-solid) !important; }
+.maplibregl-popup-close-button { color: var(--dim) !important; font-size: 1.1rem !important; padding: 4px 8px !important; }
+.maplibregl-popup-close-button:hover { color: var(--orange) !important; background: none !important; }
+
+.popup { font-family: var(--sans); }
+.popup-header { padding: 12px 14px 8px; }
+.popup-header h3 { font: 400 0.88rem/1.2 var(--serif); color: #fff; }
+.popup-type { font: 500 0.65rem/1 var(--sans); color: var(--orange); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; display: inline-block; }
+.popup-meta { padding: 6px 14px; font-size: 0.7rem; color: var(--muted); background: var(--surface); }
+
+.popup-params { padding: 8px 14px 12px; display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+.popup-params::-webkit-scrollbar { width: 3px; }
+.popup-params::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
+
+.popup-param { display: flex; flex-direction: column; gap: 2px; }
+.popup-param--selected { background: var(--orange-dim); padding: 4px 6px; border-radius: 4px; margin: -2px -6px; }
+.param-name { font: 500 0.65rem/1 var(--sans); color: var(--muted); display: flex; justify-content: space-between; }
+.param-value { font: 600 0.7rem/1 var(--sans); color: #fff; }
+
+.param-bar-container { position: relative; height: 4px; background: rgba(255,255,255,0.04); border-radius: 2px; }
+.param-bar { height: 100%; border-radius: 2px; transition: width 0.4s ease; min-width: 1px; }
+.param-threshold-line { position: absolute; top: -2px; width: 1.5px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 1px; }

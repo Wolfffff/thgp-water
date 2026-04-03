@@ -1,0 +1,97 @@
+/* Floating info button — always visible, top-right of map */
+.info-btn {
+  position: fixed; top: 16px; right: 16px; z-index: 15;
+  width: 32px; height: 32px;
+  background: var(--panel); backdrop-filter: blur(16px);
+  border: 1px solid var(--border); border-radius: 50%;
+  color: var(--muted); font: italic 600 0.9rem/1 var(--serif);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all var(--ease), right 0.3s ease;
+}
+.info-btn:hover { color: var(--orange); border-color: var(--orange); }
+
+/* About / authors modal */
+
+.overlay { position: fixed; inset: 0; z-index: 1500; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); transition: opacity 0.3s, visibility 0.3s; }
+
+#about-panel { position: relative; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 28px 24px; background: var(--panel-solid); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
+#about-panel::-webkit-scrollbar { width: 4px; }
+#about-panel::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
+
+#about-panel .princeton-wordmark { display: block; text-align: center; margin-bottom: 12px; font-size: 0.65rem; }
+#about-panel h2 { font: 400 1.3rem/1.2 var(--serif); color: #fff; text-align: center; margin-bottom: 16px; }
+#about-panel h3 { font: 500 0.62rem/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin: 18px 0 8px; }
+#about-panel p { font: 400 0.82rem/1.55 var(--sans); color: var(--muted); }
+
+.about-description { text-align: center; margin-bottom: 8px; }
+.citation { padding: 10px 14px; background: var(--surface); border-left: 2px solid var(--orange); border-radius: 0 4px 4px 0; }
+.citation em { color: var(--text); }
+
+.authors-list { display: flex; flex-direction: column; gap: 6px; }
+.author-card { padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; transition: border-color var(--ease); }
+.author-card:hover { border-color: var(--orange-dim); }
+.author-card strong { font: 600 0.82rem/1.3 var(--sans); color: #fff; display: block; }
+.author-role { font: 500 0.68rem/1 var(--sans); color: var(--orange); display: block; margin: 2px 0; }
+.author-affil { font: 400 0.72rem/1.3 var(--sans); color: var(--muted); }
+
+.close-btn { position: absolute; top: 10px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: var(--dim); font-size: 1.2rem; cursor: pointer; border-radius: 4px; transition: color var(--ease); }
+.close-btn:hover { color: var(--orange); }
+
+.source-types-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.source-types-list li { display: flex; align-items: center; gap: 6px; font: 400 0.75rem/1.3 var(--sans); color: var(--muted); }
+.source-types-list .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.about-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); font: 400 0.7rem/1 var(--sans); color: var(--dim); text-align: center; }
+
+/* Details modal — reuses overlay from about */
+#details-panel {
+  position: relative; width: 90%; max-width: 560px; max-height: 85vh;
+  overflow-y: auto; padding: 28px 24px;
+  background: var(--panel-solid); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+#details-panel::-webkit-scrollbar { width: 4px; }
+#details-panel::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
+#details-panel h2 { font: 400 1.3rem/1.2 var(--serif); color: #fff; margin-bottom: 16px; }
+#details-panel h3 {
+  font: 500 0.62rem/1 var(--sans); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--dim); margin: 18px 0 8px;
+}
+
+.details-stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-bottom: 16px;
+}
+.details-stat { text-align: center; }
+.details-stat-val { display: block; font: 600 1.4rem/1 var(--sans); color: var(--orange); }
+.details-stat-label { display: block; font: 400 0.65rem/1.2 var(--sans); color: var(--dim); margin-top: 4px; }
+
+/* D3 charts */
+.details-chart { margin: 4px 0 8px; }
+.d3-chart { width: 100%; height: auto; overflow: visible; }
+.d3-chart text { font-family: var(--sans); }
+.d3-chart .domain { stroke: var(--dim); stroke-width: 0.5; }
+.d3-chart .tick line { stroke: var(--border); }
+
+/* Worst sites list */
+.details-site-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 0; font: 400 0.78rem/1.3 var(--sans);
+  border-bottom: 1px solid var(--border);
+}
+.details-site-rank {
+  width: 18px; text-align: right;
+  font: 500 0.65rem/1 var(--sans); color: var(--dim);
+}
+.details-site-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.details-site-name { color: var(--text); flex: 1; }
+.details-site-val { color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+
+/* View Details button in sidebar */
+.btn-details {
+  width: 100%; padding: 6px; margin-top: 8px;
+  font: 500 0.72rem/1 var(--sans);
+  color: var(--orange); background: var(--orange-dim);
+  border: 1px solid var(--orange); border-radius: 4px;
+  cursor: pointer; transition: all var(--ease);
+}
+.btn-details:hover { background: var(--orange); color: #fff; }

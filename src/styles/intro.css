@@ -1,0 +1,101 @@
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#intro-overlay.intro-exit {
+  animation: fadeOut 0.5s ease forwards;
+  pointer-events: none;
+}
+
+.intro-content { max-width: 440px; text-align: center; }
+
+.intro-content > * { animation: fadeUp 0.6s ease backwards; }
+.intro-content > :nth-child(1) { animation-delay: 0.1s; }
+.intro-content > :nth-child(2) { animation-delay: 0.2s; }
+.intro-content > :nth-child(3) { animation-delay: 0.3s; }
+.intro-content > :nth-child(4) { animation-delay: 0.4s; }
+.intro-content > :nth-child(5) { animation-delay: 0.5s; }
+.intro-content > :nth-child(6) { animation-delay: 0.6s; }
+.intro-content > :nth-child(7) { animation-delay: 0.7s; }
+
+.princeton-wordmark {
+  font: 600 0.72rem/1 var(--sans);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.intro-divider {
+  width: 40px;
+  height: 2px;
+  background: var(--orange);
+  margin: 16px auto 24px;
+}
+
+.intro-content h1 {
+  font: 400 2.2rem/1.15 var(--serif);
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.intro-subtitle {
+  font: 300 1rem/1.5 var(--sans);
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.intro-meta {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--dim);
+  margin-bottom: 4px;
+}
+
+.intro-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin: 28px 0;
+}
+
+.intro-stat { text-align: center; }
+
+.intro-stat-number {
+  display: block;
+  font: 400 2.4rem/1 var(--serif);
+  color: var(--orange);
+}
+
+.intro-stat-label {
+  font: 500 0.65rem/1 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 4px;
+  display: block;
+}
+
+.btn-enter {
+  background: transparent;
+  border: 1px solid var(--dim);
+  color: var(--text);
+  padding: 11px 28px;
+  border-radius: 3px;
+  font: 500 0.82rem/1 var(--sans);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all var(--ease);
+}
+
+.btn-enter:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}

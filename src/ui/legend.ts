@@ -1,0 +1,126 @@
+import { SELECTABLE_PARAMETERS } from '../data/parameters';
+import { RATIO_COLORS, NO_DATA_COLOR, SOURCE_TYPE_COLORS } from '../utils/colors';
+
+/**
+ * Update the legend with a continuous gradient color scale bar
+ * and threshold info for the selected parameter.
+ */
+export function updateLegend(paramKey: string): void {
+  const container = document.querySelector<HTMLElement>('#legend-items');
+  const heading = document.querySelector<HTMLElement>('#legend .legend-header h4');
+  if (!container) return;
+
+  const isExceed = paramKey === 'EXCEED';
+  const param = isExceed ? null : SELECTABLE_PARAMETERS.find((p) => p.key === paramKey);
+  if (!isExceed && !param) return;
+
+  if (heading) heading.textContent = isExceed ? 'Thresholds Exceeded' : param!.displayName;
+
+  let gradient: string;
+  let ticks: { label: string; pos: string }[];
+
+  // Use colors from RATIO_COLORS to stay in sync
+  const c = RATIO_COLORS.map(s => s.color);
+
+  if (isExceed) {
+    gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[1]} 10%, ${c[2]} 20%, ${c[3]} 40%, ${c[4]} 60%, ${c[5]} 100%)`;
+    ticks = [
+      { label: '0', pos: '0%' },
+      { label: '1', pos: '20%' },
+      { label: '2', pos: '40%' },
+      { label: '3', pos: '60%' },
+      { label: '5+', pos: '100%' },
+    ];
+  } else {
+    gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[1]} 10%, ${c[2]} 15%, ${c[3]} 20%, ${c[4]} 40%, ${c[5]} 100%)`;
+    ticks = [
+      { label: '0', pos: '0%' },
+      { label: '0.5', pos: '10%' },
+      { label: '1×', pos: '20%' },
+      { label: '2×', pos: '40%' },
+      { label: '5×', pos: '100%' },
+    ];
+  }
+
+  container.innerHTML = '';
+
+  // Scale bar
+  const bar = document.createElement('div');
+  bar.className = 'legend-scale-bar';
+  bar.style.background = gradient;
+  container.appendChild(bar);
+
+  // Tick marks — positioned
+  const tickRow = document.createElement('div');
+  tickRow.className = 'legend-ticks';
+  for (const t of ticks) {
+    const tick = document.createElement('span');
+    tick.className = 'legend-tick';
+    tick.textContent = t.label;
+    tick.style.left = t.pos;
+    tickRow.appendChild(tick);
+  }
+  container.appendChild(tickRow);
+
+  // Safe / Exceeds labels
+  const labelRow = document.createElement('div');
+  labelRow.className = 'legend-labels';
+  if (isExceed) {
+    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">None</span><span style="color:${RATIO_COLORS[3].color}">Many</span>`;
+  } else {
+    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">Safe</span><span style="color:${RATIO_COLORS[3].color}">Exceeds</span>`;
+  }
+  container.appendChild(labelRow);
+
+  // No data indicator
+  const noData = document.createElement('div');
+  noData.className = 'legend-item';
+  const swatch = document.createElement('span');
+  swatch.className = 'legend-swatch';
+  swatch.style.background = NO_DATA_COLOR;
+  noData.appendChild(swatch);
+  noData.appendChild(document.createTextNode('No data'));
+  container.appendChild(noData);
+
+  // Threshold info
+  if (isExceed) {
+    const info = document.createElement('div');
+    info.className = 'legend-threshold';
+    info.textContent = 'Count of WHO/KS thresholds exceeded per site';
+    container.appendChild(info);
+  } else if (param && param.threshold !== null) {
+    const info = document.createElement('div');
+    info.className = 'legend-threshold';
+    const unitStr = param.thresholdUnit ? ` ${param.thresholdUnit}` : '';
+    const bodyStr = param.thresholdBody ? ` (${param.thresholdBody})` : '';
+    info.textContent = `Threshold: ${param.threshold}${unitStr}${bodyStr}`;
+    container.appendChild(info);
+  }
+}
+
+/**
+ * Show the source type legend — used when "Color by Source Type" is active.
+ */
+export function showSourceTypeLegend(): void {
+  const container = document.querySelector<HTMLElement>('#legend-items');
+  const heading = document.querySelector<HTMLElement>('#legend .legend-header h4');
+  if (!container) return;
+
+  if (heading) heading.textContent = 'Source Type';
+  container.innerHTML = '';
+
+  for (const [type, color] of Object.entries(SOURCE_TYPE_COLORS)) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    const dot = document.createElement('span');
+    dot.className = 'legend-swatch';
+    dot.style.background = color;
+    dot.style.borderRadius = '50%';
+    item.appendChild(dot);
+    item.appendChild(document.createTextNode(type));
+    container.appendChild(item);
+  }
+}
+
+/** No-op kept for backward compat — legend is managed by updateLegend / showSourceTypeLegend */
+export function initSourceTypeLegend(): void {}
