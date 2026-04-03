@@ -47,17 +47,10 @@ function buildIntroOverlay(): HTMLElement {
     ),
   );
 
-  const meta = el('div', { className: 'intro-meta' },
-    el('span', {}, 'Omengo \u00B7 Njeru \u00B7 Ayroles \u00B7 Niespolo'),
-    el('span', {}, '2025'),
-  );
-
   const content = el('div', { className: 'intro-content' },
-    el('span', { className: 'princeton-wordmark' }, 'PRINCETON'),
     el('div', { className: 'intro-divider' }),
     el('h1', {}, 'Turkana Water Quality'),
     el('p', { className: 'intro-subtitle' }, 'Mapping Drinking-Water Risk to Guide Intervention'),
-    meta,
     stats,
     el('button', { id: 'intro-enter', className: 'btn-enter' }, 'Explore the Map \u2192'),
   );
@@ -67,7 +60,6 @@ function buildIntroOverlay(): HTMLElement {
 
 function buildTitleBar(): HTMLElement {
   return el('div', { id: 'title-bar' },
-    el('span', { className: 'princeton-wordmark princeton-wordmark--sm' }, 'PRINCETON'),
     el('h1', {}, 'Turkana Water Quality'),
   );
 }
@@ -201,32 +193,6 @@ function buildInfoButton(): HTMLElement {
 }
 
 function buildAboutModal(): HTMLElement {
-  /* Citation with <em> tag */
-  const citationP = el('p', { className: 'citation' },
-    'Omengo, F., Njeru, S., Ayroles, J., & Niespolo, E. (2025). Mapping Drinking-Water Risk in Turkana to Guide Intervention. ',
-  );
-  const emTag = el('em', {}, 'Department of Geosciences, Princeton University');
-  citationP.appendChild(emTag);
-  citationP.appendChild(document.createTextNode('.'));
-
-  /* Authors */
-  const authorsData: [string, string, string][] = [
-    ['Fred Omengo', 'Lead Researcher', 'Princeton University \u00B7 Turkana Basin Institute \u00B7 Wildlife Research and Training Institute'],
-    ['Sospecter Njeru', 'Co-Investigator', 'Kenya Medical Research Institute'],
-    ['Julien Ayroles', 'Principal Investigator', 'UC Berkeley \u00B7 Turkana Basin Institute'],
-    ['Elizabeth Niespolo', 'Corresponding Author', 'Princeton University \u00B7 fo5058@princeton.edu'],
-  ];
-
-  const authorsList = el('div', { className: 'authors-list' },
-    ...authorsData.map(([name, role, affil]) =>
-      el('div', { className: 'author-card' },
-        el('strong', {}, name),
-        el('span', { className: 'author-role' }, role),
-        el('span', { className: 'author-affil' }, affil),
-      ),
-    ),
-  );
-
   /* Source types */
   const sourceTypes: [string, string][] = [
     ['#1b9e77', 'Deep Borehole, Solar (DBH solar) \u2014 n=90'],
@@ -246,15 +212,10 @@ function buildAboutModal(): HTMLElement {
 
   const panel = el('div', { id: 'about-panel' },
     el('button', { id: 'about-close', className: 'close-btn' }, '\u00D7'),
-    el('span', { className: 'princeton-wordmark' }, 'PRINCETON'),
     el('h2', {}, 'About This Map'),
     el('p', { className: 'about-description' },
-      'Interactive companion to the paper analyzing 152 water sources across Turkana County, Kenya for 48 physical-chemical parameters.',
+      'Interactive map analyzing 152 water sources across Turkana County, Kenya for 48 physical-chemical parameters.',
     ),
-    el('h3', {}, 'Citation'),
-    citationP,
-    el('h3', {}, 'Authors'),
-    authorsList,
     el('h3', {}, 'Data'),
     el('p', {},
       '152 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against WHO Guidelines for Drinking-water Quality and Kenya Bureau of Standards KS 459-1:2007.',

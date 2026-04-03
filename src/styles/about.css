@@ -18,7 +18,6 @@
 #about-panel::-webkit-scrollbar { width: 4px; }
 #about-panel::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
 
-#about-panel .princeton-wordmark { display: block; text-align: center; margin-bottom: 12px; font-size: 0.65rem; }
 #about-panel h2 { font: 400 1.3rem/1.2 var(--serif); color: #fff; text-align: center; margin-bottom: 16px; }
 #about-panel h3 { font: 500 0.62rem/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); margin: 18px 0 8px; }
 #about-panel p { font: 400 0.82rem/1.55 var(--sans); color: var(--muted); }

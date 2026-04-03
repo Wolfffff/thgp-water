@@ -220,7 +220,7 @@ export function initSidebarToggle(): void {
     sidebar.classList.toggle('sidebar--collapsed');
   });
 
-  // Swipe right to collapse sidebar on touch devices
+  // Swipe to collapse: right on desktop, down on mobile bottom sheet
   let startX = 0;
   let startY = 0;
   sidebar.addEventListener('touchstart', (e) => {
@@ -230,10 +230,19 @@ export function initSidebarToggle(): void {
 
   sidebar.addEventListener('touchend', (e) => {
     const dx = e.changedTouches[0].clientX - startX;
-    const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    // Swipe right (>50px horizontal, less vertical) = collapse
-    if (dx > 50 && dy < 80) {
-      sidebar.classList.add('sidebar--collapsed');
+    const dy = e.changedTouches[0].clientY - startY;
+    const isMobile = window.innerWidth <= 640;
+
+    if (isMobile) {
+      // Swipe down > 40px = collapse bottom sheet
+      if (dy > 40 && Math.abs(dx) < 80) {
+        sidebar.classList.add('sidebar--collapsed');
+      }
+    } else {
+      // Swipe right > 50px = collapse right sidebar
+      if (dx > 50 && Math.abs(dy) < 80) {
+        sidebar.classList.add('sidebar--collapsed');
+      }
     }
   }, { passive: true });
 }

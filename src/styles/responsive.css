@@ -14,44 +14,60 @@
 
 /* Mobile */
 @media (max-width: 640px) {
-  /* Sidebar stays on the right but narrower, collapsed by default on mobile */
-  #sidebar { width: 220px; }
-  #sidebar.sidebar--collapsed { transform: translateX(220px); }
+  /* Sidebar becomes a bottom sheet */
+  #sidebar {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: auto; max-height: 60vh;
+    border-left: none; border-top: 1px solid var(--border);
+    border-radius: 14px 14px 0 0;
+    transform: none;
+  }
+  #sidebar.sidebar--collapsed { transform: translateY(calc(100% - 28px)); }
+
+  /* Drag handle at top of sheet */
+  .sidebar-toggle {
+    left: 50%; top: 0; transform: translateX(-50%);
+    width: 100%; height: 28px;
+    border: none; border-radius: 14px 14px 0 0;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sidebar-toggle-icon { display: none; }
+  .sidebar-toggle::after {
+    content: ''; display: block;
+    width: 32px; height: 4px;
+    background: var(--dim); border-radius: 2px;
+  }
 
   .sidebar-content {
-    padding: 14px 12px 20px; gap: 12px;
+    padding: 4px 16px 28px; gap: 12px;
+    max-height: calc(60vh - 28px); overflow-y: auto;
   }
 
   /* Title bar — smaller */
-  #title-bar {
-    top: 8px; left: 8px;
-    padding: 8px 10px;
-  }
+  #title-bar { top: 8px; left: 8px; padding: 8px 10px; }
   #title-bar h1 { font-size: 0.85rem; }
-  #title-bar .princeton-wordmark { font-size: 0.45rem; }
 
-  /* Info button — below title bar on mobile */
-  .info-btn { top: 56px; right: 8px; width: 28px; height: 28px; font-size: 0.8rem; }
+  /* Info button */
+  .info-btn { top: 8px; right: 8px; width: 28px; height: 28px; font-size: 0.8rem; }
 
-  /* Basemap picker — top right corner on mobile */
-  .basemap-picker {
-    bottom: auto; top: 8px; right: 8px;
-    flex-direction: row; gap: 4px;
-  }
+  /* Basemap picker — behind bottom sheet */
+  .basemap-picker { bottom: 82px; right: 8px; z-index: 5; }
   .basemap-option { width: 44px; }
   .basemap-thumb { width: 36px; height: 36px; }
   .basemap-label { font-size: 0.4rem; }
-  .basemap-stack-label { display: none; }
+  .basemap-stack-label { bottom: -12px; font-size: 0.45rem; }
 
-  /* Stacked state adjustments for horizontal layout */
-  .basemap--stacked .basemap-option:not(.basemap-option--active) {
-    transform: translate(4px, 0); bottom: auto; right: auto;
+  /* No sidebar shift on mobile — everything stays put */
+  body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
+  body:has(#sidebar:not(.sidebar--collapsed)) .info-btn,
+  body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right {
+    right: 8px !important;
   }
 
-
-  /* Zoom controls — smaller */
-  .maplibregl-ctrl-bottom-left { left: 8px !important; bottom: 16px !important; }
-  .maplibregl-ctrl-bottom-right { right: 8px !important; bottom: 4px !important; }
+  /* Zoom + scale/attribution — same height, above collapsed sheet */
+  .maplibregl-ctrl-bottom-left { left: 8px !important; bottom: 36px !important; }
+  .maplibregl-ctrl-bottom-right { right: 8px !important; bottom: 36px !important; }
 
   /* Intro — smaller text */
   .intro-content { max-width: 320px; padding: 0 16px; }
@@ -61,30 +77,27 @@
   .intro-stat-number { font-size: 1.8rem; }
   .intro-meta { flex-direction: column; gap: 4px; }
 
-  /* Tour card — narrower, anchored to bottom-left away from sidebar */
+  /* Tour card — mid screen on mobile, above bottom sheet */
   .tour-card {
-    width: calc(100vw - 240px); max-width: 320px;
-    bottom: 12px; left: 12px; transform: none;
+    width: calc(100vw - 24px); max-width: none;
+    bottom: auto; top: 50%; left: 12px;
+    transform: translateY(-50%);
   }
 
-  /* Modals — full-screen sheets from bottom */
+  /* Modals — bottom sheets */
   .overlay { align-items: flex-end; }
   #details-panel, #about-panel {
     width: 100%; max-width: none; max-height: 85vh;
-    border-radius: 12px 12px 0 0;
+    border-radius: 14px 14px 0 0;
     padding: 20px 16px 32px;
   }
   .details-stats-grid { grid-template-columns: repeat(2, 1fr); }
 
-  /* Popups — smaller */
+  /* Popups */
   .maplibregl-popup-content { min-width: 200px; max-width: 260px; }
 
-  /* Tour highlight — keep z-index above sidebar */
+  /* Tour highlight */
   .tour-highlight { z-index: 1750; }
-
-  /* Don't shift basemap/info for sidebar on mobile — sidebar is narrow */
-  body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker { right: 236px !important; }
-  body:has(#sidebar:not(.sidebar--collapsed)) .info-btn { right: 236px !important; }
 }
 
 /* Very small screens */

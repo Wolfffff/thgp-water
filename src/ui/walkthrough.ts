@@ -57,9 +57,7 @@ const TOUR_STEPS: TourStep[] = [
     text: 'Use the sidebar to switch between 29 water quality parameters, or view the Alerts mode showing how many thresholds each site exceeds.',
     highlight: '#param-section',
     action: () => {
-      // Ensure sidebar is open
       document.querySelector('#sidebar')?.classList.remove('sidebar--collapsed');
-      // Ensure param section is expanded
       document.querySelector('#param-section')?.classList.remove('section--collapsed');
     },
     btnText: 'Next',
@@ -154,14 +152,12 @@ function runTour(map: Map): void {
 
     const prevHadHighlight = highlight.style.opacity === '1';
 
-    if (step.highlight) {
-      // Delay positioning so sidebar/DOM animations settle
+    const isMobile = window.innerWidth <= 640;
+
+    if (step.highlight && !isMobile) {
+      // Desktop: highlight the target element
       backdrop.style.opacity = '0';
-      if (!prevHadHighlight) {
-        // Coming from a non-highlight step — hide first, then show
-        highlight.style.opacity = '0';
-      }
-      // else: keep highlight visible and smoothly transition position (CSS transition handles it)
+      if (!prevHadHighlight) highlight.style.opacity = '0';
 
       setTimeout(() => {
         const target = $(step.highlight!);

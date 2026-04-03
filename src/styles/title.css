@@ -7,10 +7,6 @@
   padding: 10px 14px;
   animation: fadeUp 0.5s ease 0.2s backwards;
 }
-#title-bar .princeton-wordmark {
-  font-size: 0.55rem; letter-spacing: 0.2em;
-  display: block; margin-bottom: 2px; opacity: 0.8;
-}
 #title-bar h1 {
   font: 400 1rem/1.2 var(--serif);
   color: #fff;
