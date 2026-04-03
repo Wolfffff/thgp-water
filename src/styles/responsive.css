@@ -1,7 +1,7 @@
 /* ── Mobile & tablet responsive styles ── */
 
 /* Tablets and small desktops */
-@media (max-width: 900px) {
+@media (min-width: 641px) and (max-width: 900px) {
   #sidebar { width: 240px; }
   #sidebar.sidebar--collapsed { transform: translateX(240px); }
 

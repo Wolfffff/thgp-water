@@ -1,6 +1,6 @@
 /* Basemap picker — stacked tiles that expand left on click */
 .basemap-picker {
-  position: fixed; bottom: 36px; right: 16px; z-index: 10;
+  position: fixed; bottom: 28px; right: 16px; z-index: 10;
   display: flex; flex-direction: row-reverse; align-items: flex-end; gap: 6px;
   transition: right 0.3s ease;
 }
@@ -87,8 +87,10 @@
   backdrop-filter: blur(4px);
 }
 
-/* Shift right-side elements when sidebar is open */
-body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
-body:has(#sidebar:not(.sidebar--collapsed)) .info-btn {
-  right: 296px !important;
+/* Shift right-side elements when sidebar is open — desktop only */
+@media (min-width: 641px) {
+  body:has(#sidebar:not(.sidebar--collapsed)) .basemap-picker,
+  body:has(#sidebar:not(.sidebar--collapsed)) .info-btn {
+    right: 296px !important;
+  }
 }

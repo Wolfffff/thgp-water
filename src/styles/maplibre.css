@@ -32,6 +32,8 @@
   right: 16px !important; bottom: 4px !important;
   transition: right 0.3s ease;
 }
-body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right {
-  right: 296px !important;
+@media (min-width: 641px) {
+  body:has(#sidebar:not(.sidebar--collapsed)) .maplibregl-ctrl-bottom-right {
+    right: 296px !important;
+  }
 }
