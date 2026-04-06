@@ -219,15 +219,9 @@ export function initSidebarToggle(): void {
     if (isMobile) {
       // Clear any leftover inline styles from dragging
       sidebar.style.transition = '';
-      if (sidebar.classList.contains('sidebar--collapsed')) {
-        sidebar.classList.remove('sidebar--collapsed');
-        sidebar.style.maxHeight = '45vh';
-        sidebar.style.transform = '';
-      } else {
-        sidebar.classList.add('sidebar--collapsed');
-        sidebar.style.maxHeight = '';
-        sidebar.style.transform = '';
-      }
+      sidebar.style.maxHeight = '';
+      sidebar.style.transform = '';
+      sidebar.classList.toggle('sidebar--collapsed');
     } else {
       sidebar.classList.toggle('sidebar--collapsed');
       sidebar.style.transform = '';
