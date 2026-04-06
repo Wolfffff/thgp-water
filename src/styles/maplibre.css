@@ -2,8 +2,8 @@
 .maplibregl-ctrl-group {
   background: var(--panel-solid) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 4px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important;
 }
 .maplibregl-ctrl-group button { background: transparent !important; border-color: var(--border) !important; }
 .maplibregl-ctrl-group button:hover { background: var(--surface) !important; }
@@ -11,12 +11,13 @@
 
 /* Attribution — compact, expands on click */
 .maplibregl-ctrl-attrib {
-  background: rgba(0,0,0,0.45) !important; color: #aaa !important;
-  font-size: 0.45rem !important; border-radius: 4px;
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.5) !important; color: #aaa !important;
+  font-size: 0.55rem !important; border-radius: 4px;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
-.maplibregl-ctrl-attrib a { color: #bbb !important; }
-.maplibregl-ctrl-logo { opacity: 0.5; }
+.maplibregl-ctrl-attrib a { color: #ccc !important; text-decoration: none !important; }
+.maplibregl-ctrl-attrib a:hover { color: #fff !important; text-decoration: underline !important; }
+.maplibregl-ctrl-logo { opacity: 0.6; }
 
 /* Bottom-right: attribution + scale in a horizontal row */
 .maplibregl-ctrl-bottom-right {
