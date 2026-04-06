@@ -1,6 +1,17 @@
 import maplibregl, { type Map } from 'maplibre-gl';
+import { buildIntroOverlay } from './dom';
 
 const STORAGE_KEY = 'thgp-walkthrough-seen';
+
+function storageGet(key: string): string | null {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function storageSet(key: string, val: string): void {
+  try { localStorage.setItem(key, val); } catch { /* private browsing */ }
+}
+function storageRemove(key: string): void {
+  try { localStorage.removeItem(key); } catch { /* private browsing */ }
+}
 
 interface TourStep {
   title: string;
@@ -218,11 +229,37 @@ function runTour(map: Map): void {
       highlight.remove();
     }, 300);
     document.removeEventListener('keydown', onKey);
-    localStorage.setItem(STORAGE_KEY, 'true');
+    storageSet(STORAGE_KEY, 'true');
+
+    // Clear any inline styles the tour set on the sidebar
+    const sidebar = document.querySelector<HTMLElement>('#sidebar');
+    if (sidebar) {
+      sidebar.style.maxHeight = '';
+      sidebar.style.transform = '';
+      sidebar.style.transition = '';
+    }
   }
 
   // Entrance
   requestAnimationFrame(() => showStep(0));
+}
+
+function showIntroThenTour(map: Map): void {
+  // Remove any existing intro overlay or tour elements
+  $('#intro-overlay')?.remove();
+  document.querySelector('.tour-card')?.remove();
+  document.querySelector('.tour-backdrop')?.remove();
+  document.querySelector('.tour-highlight')?.remove();
+
+  // Re-create and insert the intro overlay
+  const overlay = buildIntroOverlay();
+  document.body.appendChild(overlay);
+  document.body.classList.add('intro-active');
+
+  const enterBtn = overlay.querySelector('#intro-enter');
+  if (enterBtn) {
+    enterBtn.addEventListener('click', () => dismissIntro(map));
+  }
 }
 
 function dismissIntro(map: Map): void {
@@ -238,7 +275,7 @@ function dismissIntro(map: Map): void {
 
 export function initIntroAndWalkthrough(map: Map, setParam?: (key: string) => void): void {
   _setParam = setParam;
-  const seen = localStorage.getItem(STORAGE_KEY) === 'true';
+  const seen = storageGet(STORAGE_KEY) === 'true';
 
   if (seen) {
     const overlay = $('#intro-overlay');
@@ -253,10 +290,10 @@ export function initIntroAndWalkthrough(map: Map, setParam?: (key: string) => vo
 
   const tourBtn = $('#tour-btn');
   if (tourBtn) {
-    tourBtn.addEventListener('click', () => runTour(map));
+    tourBtn.addEventListener('click', () => showIntroThenTour(map));
   }
 }
 
 export function resetWalkthrough(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  storageRemove(STORAGE_KEY);
 }

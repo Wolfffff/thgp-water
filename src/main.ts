@@ -38,7 +38,6 @@ import {
   initColorModeToggle,
   initFilters,
   getActiveSourceTypes,
-  setOnAfterStyleChange,
 } from './ui/controls';
 import { updateLegend, initSourceTypeLegend, showSourceTypeLegend } from './ui/legend';
 import { colorBySourceType } from './map/layers';
@@ -178,19 +177,37 @@ function addSourcesAndLayers(
 
 map.on('load', async () => {
   /* Fetch all GeoJSON data in parallel */
-  const [sitesRes, boundaryRes, wardsRes, kenyaRes] = await Promise.all([
-    fetch('data/sites.geojson'),
-    fetch('data/turkana-boundary.geojson'),
-    fetch('data/turkana-wards.geojson'),
-    fetch('data/kenya-boundary.geojson'),
-  ]);
+  let sites: GeoJSON.FeatureCollection;
+  let boundary: GeoJSON.FeatureCollection;
+  let wards: GeoJSON.FeatureCollection;
+  let kenya: GeoJSON.FeatureCollection;
 
-  const [sites, boundary, wards, kenya] = (await Promise.all([
-    sitesRes.json(),
-    boundaryRes.json(),
-    wardsRes.json(),
-    kenyaRes.json(),
-  ])) as [GeoJSON.FeatureCollection, GeoJSON.FeatureCollection, GeoJSON.FeatureCollection, GeoJSON.FeatureCollection];
+  try {
+    const [sitesRes, boundaryRes, wardsRes, kenyaRes] = await Promise.all([
+      fetch('data/sites.geojson'),
+      fetch('data/turkana-boundary.geojson'),
+      fetch('data/turkana-wards.geojson'),
+      fetch('data/kenya-boundary.geojson'),
+    ]);
+
+    for (const res of [sitesRes, boundaryRes, wardsRes, kenyaRes]) {
+      if (!res.ok) throw new Error(`Failed to load ${res.url}: ${res.status}`);
+    }
+
+    [sites, boundary, wards, kenya] = (await Promise.all([
+      sitesRes.json(),
+      boundaryRes.json(),
+      wardsRes.json(),
+      kenyaRes.json(),
+    ])) as [GeoJSON.FeatureCollection, GeoJSON.FeatureCollection, GeoJSON.FeatureCollection, GeoJSON.FeatureCollection];
+  } catch (err) {
+    console.error('Data load failed:', err);
+    const msg = document.createElement('div');
+    msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);padding:24px 32px;background:var(--panel-solid);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--sans);text-align:center;z-index:9999';
+    msg.innerHTML = '<h3 style="margin-bottom:8px">Unable to load map data</h3><p style="color:var(--muted);font-size:0.85rem">Please check your connection and reload the page.</p>';
+    document.body.appendChild(msg);
+    return;
+  }
 
   /* Flatten nested properties for MapLibre expressions */
   flattenFeatureProperties(sites);

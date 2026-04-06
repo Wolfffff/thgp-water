@@ -1,7 +1,7 @@
 /* ── Title bar ── top-left overlay ── */
 
 #title-bar {
-  position: absolute; top: 16px; left: 16px; z-index: 10;
+  position: absolute; top: 16px; left: 16px; z-index: 11;
   background: var(--panel); backdrop-filter: blur(16px);
   border: 1px solid var(--border); border-radius: var(--r);
   padding: 10px 14px;

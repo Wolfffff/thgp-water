@@ -31,7 +31,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 
 /* ── section builders ────────────────────────────────────────────────── */
 
-function buildIntroOverlay(): HTMLElement {
+export function buildIntroOverlay(): HTMLElement {
   const statData: [string, string][] = [
     ['152', 'Sites'],
     ['48', 'Parameters'],
@@ -157,13 +157,13 @@ function buildSidebar(): HTMLElement {
   toggleIcon.classList.add('sidebar-toggle-icon');
   toggleIcon.innerHTML = '<path d="M5 1 L1 6 L5 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
 
-  const toggle = el('button', { id: 'sidebar-toggle', className: 'sidebar-toggle' });
+  const toggle = el('button', { id: 'sidebar-toggle', className: 'sidebar-toggle', 'aria-label': 'Toggle sidebar' });
   toggle.appendChild(toggleIcon);
 
   /* Legend — inside sidebar */
   const legendHeader = el('div', { className: 'legend-header' },
     el('h4', {}, 'Legend'),
-    el('button', { id: 'legend-toggle', className: 'legend-toggle' }, '\u2212'),
+    el('button', { id: 'legend-toggle', className: 'legend-toggle', 'aria-label': 'Toggle legend' }, '\u2212'),
   );
   const legendBody = el('div', { id: 'legend-body', className: 'legend-body' },
     el('div', { id: 'legend-items' }),
@@ -188,7 +188,7 @@ function buildSidebar(): HTMLElement {
 }
 
 function buildInfoButton(): HTMLElement {
-  return el('button', { id: 'info-btn', className: 'info-btn', title: 'About this map' }, 'i');
+  return el('button', { id: 'info-btn', className: 'info-btn', title: 'About this map', 'aria-label': 'About this map' }, 'i');
 }
 
 function buildAboutModal(): HTMLElement {
@@ -228,7 +228,7 @@ function buildAboutModal(): HTMLElement {
   );
 
   const panel = el('div', { id: 'about-panel' },
-    el('button', { id: 'about-close', className: 'close-btn' }, '\u00D7'),
+    el('button', { id: 'about-close', className: 'close-btn', 'aria-label': 'Close' }, '\u00D7'),
     el('h2', {}, 'About This Map'),
     el('p', { className: 'about-description' },
       'Interactive map analyzing 152 water sources across Turkana County, Kenya for 48 physical-chemical parameters.',
@@ -243,7 +243,7 @@ function buildAboutModal(): HTMLElement {
     sourceList,
   );
 
-  return el('div', { id: 'about-overlay', className: 'overlay hidden' }, panel);
+  return el('div', { id: 'about-overlay', className: 'overlay hidden', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'About this map' }, panel);
 }
 
 function buildWalkthrough(): HTMLElement {
@@ -308,11 +308,11 @@ function buildWalkthrough(): HTMLElement {
 
 function buildDetailsModal(): HTMLElement {
   const panel = el('div', { id: 'details-panel' },
-    el('button', { id: 'details-close', className: 'close-btn' }, '\u00D7'),
+    el('button', { id: 'details-close', className: 'close-btn', 'aria-label': 'Close' }, '\u00D7'),
     el('h2', { id: 'details-title' }, 'Parameter Details'),
     el('div', { id: 'details-content' }),
   );
-  return el('div', { id: 'details-overlay', className: 'overlay hidden' }, panel);
+  return el('div', { id: 'details-overlay', className: 'overlay hidden', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Parameter details' }, panel);
 }
 
 function buildBasemapPicker(): HTMLElement {

@@ -2,8 +2,6 @@ import type { Map } from 'maplibre-gl';
 import { SELECTABLE_PARAMETERS } from '../data/parameters';
 import { BASEMAP_TILES, type BasemapKey } from '../map/styles';
 
-// No longer needed — basemap switching no longer destroys data layers
-export function setOnAfterStyleChange(_cb: (() => void) | null): void {}
 
 // ---------------------------------------------------------------------------
 // Parameter dropdown
@@ -219,7 +217,8 @@ export function initSidebarToggle(): void {
   toggle.addEventListener('click', () => {
     const isMobile = window.innerWidth <= 640;
     if (isMobile) {
-      // Toggle between collapsed and half-screen
+      // Clear any leftover inline styles from dragging
+      sidebar.style.transition = '';
       if (sidebar.classList.contains('sidebar--collapsed')) {
         sidebar.classList.remove('sidebar--collapsed');
         sidebar.style.maxHeight = '45vh';
@@ -231,16 +230,19 @@ export function initSidebarToggle(): void {
       }
     } else {
       sidebar.classList.toggle('sidebar--collapsed');
+      sidebar.style.transform = '';
     }
   });
 
-  // Mobile: smooth drag to resize bottom sheet
+  // Mobile: smooth drag to resize bottom sheet — only from the handle
   let startY = 0;
   let startX = 0;
   let dragging = false;
   let startHeight = 0;
 
   sidebar.addEventListener('touchstart', (e) => {
+    // Only initiate drag from the handle, not from scrollable content
+    if (!toggle.contains(e.target as Node)) return;
     startY = e.touches[0].clientY;
     startX = e.touches[0].clientX;
     dragging = true;
@@ -275,14 +277,13 @@ export function initSidebarToggle(): void {
     if (isMobile) {
       const finalHeight = sidebar.getBoundingClientRect().height;
       if (finalHeight < 60) {
-        // Very small — fully collapse
+        // Very small — fully collapse, clear all inline styles
         sidebar.classList.add('sidebar--collapsed');
         sidebar.style.maxHeight = '';
         sidebar.style.transform = '';
       } else {
-        // Keep at current height
         sidebar.style.maxHeight = `${finalHeight}px`;
-        sidebar.style.transform = 'none';
+        sidebar.style.transform = '';
       }
     } else {
       sidebar.style.transform = '';

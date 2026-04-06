@@ -4,7 +4,7 @@ export default defineConfig({
   base: './',
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
     chunkSizeWarningLimit: 1200, // MapLibre is ~280KB gzipped, suppress warning
   },
   optimizeDeps: {
