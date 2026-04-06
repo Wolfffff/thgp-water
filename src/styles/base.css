@@ -15,8 +15,8 @@
   --dim: #55514b;
   --border: rgba(255, 255, 255, 0.07);
   --r: 10px;
-  --serif: 'DM Serif Display', Georgia, serif;
-  --sans: 'DM Sans', system-ui, sans-serif;
+  --serif: 'Nunito Sans', system-ui, sans-serif;
+  --sans: 'Nunito Sans', system-ui, sans-serif;
   --ease: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

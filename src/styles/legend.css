@@ -24,8 +24,7 @@
 
 /* Gradient scale bar */
 .legend-scale-bar {
-  height: 12px; border-radius: 3px; width: 100%;
-  border: 1px solid rgba(255,255,255,0.1);
+  height: 10px; border-radius: 5px; width: 100%;
 }
 .legend-ticks {
   position: relative; height: 14px; margin-top: 3px;
@@ -35,9 +34,12 @@
   position: absolute; transform: translateX(-50%);
 }
 .legend-labels {
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; align-items: center;
   font: 600 0.7rem/1 var(--sans);
   margin-top: 2px;
+}
+.legend-no-data {
+  font: 400 0.65rem/1 var(--sans); color: var(--muted);
 }
 
 .legend-item {

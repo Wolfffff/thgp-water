@@ -23,21 +23,21 @@ export function updateLegend(paramKey: string): void {
   const c = RATIO_COLORS.map(s => s.color);
 
   if (isExceed) {
-    gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[1]} 10%, ${c[2]} 20%, ${c[3]} 40%, ${c[4]} 60%, ${c[5]} 100%)`;
+    gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[0]} 5%, ${c[1]} 15%, ${c[2]} 30%, ${c[3]} 55%, ${c[4]} 78%, ${c[5]} 100%)`;
     ticks = [
       { label: '0', pos: '0%' },
-      { label: '1', pos: '20%' },
-      { label: '2', pos: '40%' },
-      { label: '3', pos: '60%' },
+      { label: '1', pos: '25%' },
+      { label: '2', pos: '50%' },
+      { label: '3', pos: '75%' },
       { label: '5+', pos: '100%' },
     ];
   } else {
-    gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[1]} 10%, ${c[2]} 15%, ${c[3]} 20%, ${c[4]} 40%, ${c[5]} 100%)`;
+    gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[0]} 5%, ${c[1]} 12%, ${c[2]} 22%, ${c[3]} 38%, ${c[4]} 65%, ${c[5]} 100%)`;
     ticks = [
       { label: '0', pos: '0%' },
-      { label: '0.5', pos: '10%' },
-      { label: '1×', pos: '20%' },
-      { label: '2×', pos: '40%' },
+      { label: '0.5', pos: '12%' },
+      { label: '1×', pos: '22%' },
+      { label: '2×', pos: '45%' },
       { label: '5×', pos: '100%' },
     ];
   }
@@ -62,25 +62,15 @@ export function updateLegend(paramKey: string): void {
   }
   container.appendChild(tickRow);
 
-  // Safe / Exceeds labels
+  // Safe / Exceeds labels + No data — single row
   const labelRow = document.createElement('div');
   labelRow.className = 'legend-labels';
   if (isExceed) {
-    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">None</span><span style="color:${RATIO_COLORS[3].color}">Many</span>`;
+    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">None</span><span class="legend-no-data"><span class="legend-swatch" style="background:${NO_DATA_COLOR};width:10px;height:10px;display:inline-block;border-radius:2px;vertical-align:middle;margin-right:4px"></span>No data</span><span style="color:${RATIO_COLORS[3].color}">Many</span>`;
   } else {
-    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">Safe</span><span style="color:${RATIO_COLORS[3].color}">Exceeds</span>`;
+    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">Safe</span><span class="legend-no-data"><span class="legend-swatch" style="background:${NO_DATA_COLOR};width:10px;height:10px;display:inline-block;border-radius:2px;vertical-align:middle;margin-right:4px"></span>No data</span><span style="color:${RATIO_COLORS[3].color}">Exceeds</span>`;
   }
   container.appendChild(labelRow);
-
-  // No data indicator
-  const noData = document.createElement('div');
-  noData.className = 'legend-item';
-  const swatch = document.createElement('span');
-  swatch.className = 'legend-swatch';
-  swatch.style.background = NO_DATA_COLOR;
-  noData.appendChild(swatch);
-  noData.appendChild(document.createTextNode('No data'));
-  container.appendChild(noData);
 
   // Threshold info
   if (isExceed) {
