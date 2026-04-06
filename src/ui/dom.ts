@@ -317,9 +317,10 @@ function buildDetailsModal(): HTMLElement {
 
 function buildBasemapPicker(): HTMLElement {
   const basemaps: [string, string, string][] = [
-    ['osm', 'Dark', 'https://a.basemaps.cartocdn.com/dark_all/5/18/16@2x.png'],
+    ['light', 'Light', 'https://a.basemaps.cartocdn.com/rastertiles/voyager/5/18/16@2x.png'],
+    ['dark', 'Dark', 'https://a.basemaps.cartocdn.com/dark_all/5/18/16@2x.png'],
     ['satellite', 'Satellite', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/5/16/18'],
-    ['topo', 'Light', 'https://a.basemaps.cartocdn.com/rastertiles/voyager/5/18/16@2x.png'],
+    ['terrain', 'Terrain', 'https://a.tile.opentopomap.org/5/18/16.png'],
   ];
 
   const picker = el('div', { id: 'basemap-picker', className: 'basemap-picker basemap--stacked' });
@@ -327,7 +328,7 @@ function buildBasemapPicker(): HTMLElement {
   // Tile options
   for (const [key, label, thumb] of basemaps) {
     const btn = el('button', {
-      className: key === 'osm' ? 'basemap-option basemap-option--active' : 'basemap-option',
+      className: key === 'light' ? 'basemap-option basemap-option--active' : 'basemap-option',
       'data-basemap': key,
     },
       el('img', { src: thumb, alt: label, className: 'basemap-thumb' }),
@@ -342,9 +343,10 @@ function buildBasemapPicker(): HTMLElement {
 
   // Hidden select for controls.ts compatibility
   const hiddenSelect = el('select', { id: 'basemap-select', style: 'display:none' },
-    el('option', { value: 'osm' }, 'Map'),
+    el('option', { value: 'light' }, 'Light'),
+    el('option', { value: 'dark' }, 'Dark'),
     el('option', { value: 'satellite' }, 'Satellite'),
-    el('option', { value: 'topo' }, 'Terrain'),
+    el('option', { value: 'terrain' }, 'Terrain'),
   );
   picker.appendChild(hiddenSelect);
 

@@ -6,7 +6,12 @@ import type { StyleSpecification } from 'maplibre-gl';
  * The map uses a single style with a swappable raster source.
  */
 export const BASEMAP_TILES: Record<string, { url: string; attribution: string; maxzoom: number }> = {
-  osm: {
+  light: {
+    url: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxzoom: 20,
+  },
+  dark: {
     url: 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
     attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxzoom: 20,
@@ -16,15 +21,15 @@ export const BASEMAP_TILES: Record<string, { url: string; attribution: string; m
     attribution: 'Esri, Maxar, Earthstar Geographics, and the GIS User Community',
     maxzoom: 22,
   },
-  topo: {
-    url: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxzoom: 20,
+  terrain: {
+    url: 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxzoom: 17,
   },
 };
 
 export type BasemapKey = keyof typeof BASEMAP_TILES;
-export const DEFAULT_BASEMAP: BasemapKey = 'osm';
+export const DEFAULT_BASEMAP: BasemapKey = 'light';
 
 /**
  * The initial MapLibre style — a single raster source that we swap tiles on.
@@ -38,7 +43,7 @@ export function getInitialStyle(): StyleSpecification {
       basemap: {
         type: 'raster',
         tiles: [basemap.url],
-        tileSize: 512,
+        tileSize: 256,
         attribution: basemap.attribution,
         maxzoom: basemap.maxzoom,
       },
