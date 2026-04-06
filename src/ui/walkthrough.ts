@@ -49,7 +49,9 @@ const TOUR_STEPS: TourStep[] = [
       map.flyTo({ center: [35.15, 3.56], zoom: 12, duration: 1800 });
       // After fly settles, open a popup on the worst site to highlight it
       setTimeout(() => {
-        const popup = new maplibregl.Popup({ maxWidth: '240px', closeOnClick: true })
+        // Only show if still on this step (user hasn't advanced)
+        if (!document.querySelector('.tour-card')) return;
+        new maplibregl.Popup({ maxWidth: '240px', closeOnClick: true, closeButton: false })
           .setLngLat([35.14829, 3.55873])
           .setHTML(`<div style="padding:8px;font-family:var(--sans);color:var(--text)">
             <strong style="color:#fff">Nadwat Main BH</strong><br>
@@ -57,9 +59,7 @@ const TOUR_STEPS: TourStep[] = [
             <span style="color:var(--muted);font-size:0.75rem">8.5× WHO/KS threshold</span>
           </div>`)
           .addTo(map);
-        // Auto-close after 5s
-        setTimeout(() => popup.remove(), 5000);
-      }, 2000);
+      }, 2200);
     },
     btnText: 'Next',
   },
@@ -79,6 +79,9 @@ const TOUR_STEPS: TourStep[] = [
     highlight: '#sidebar .color-mode-toggle',
     action: () => {
       document.querySelector('#sidebar')?.classList.remove('sidebar--collapsed');
+      // The Color By section is collapsed by default — expand it so the toggle is visible
+      const colorSection = document.querySelector('#sidebar .color-mode-toggle')?.closest('.sidebar-section');
+      colorSection?.classList.remove('section--collapsed');
     },
     btnText: 'Next',
   },
@@ -146,6 +149,11 @@ function runTour(map: Map): void {
   function showStep(index: number): void {
     const step = TOUR_STEPS[index];
     if (!step) return;
+
+    // Cancel any in-flight map animation from a previous step
+    map.stop();
+    // Close any lingering popups from previous steps
+    document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove());
 
     // Fade out body, swap content, fade in
     bodyEl.style.opacity = '0';
@@ -220,6 +228,8 @@ function runTour(map: Map): void {
   document.addEventListener('keydown', onKey);
 
   function cleanup(): void {
+    map.stop();
+    document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove());
     card.classList.add('tour-card--exit');
     backdrop.style.opacity = '0';
     highlight.style.opacity = '0';
