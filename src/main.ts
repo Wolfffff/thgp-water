@@ -65,11 +65,11 @@ const map = new maplibregl.Map({
   minZoom: MIN_ZOOM,
   maxZoom: MAX_ZOOM,
   maxBounds: MAX_BOUNDS,
+  attributionControl: false,
 });
 
-map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-left');
 map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-right');
-// Attribution is auto-added to bottom-right by MapLibre
+map.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-right');
 
 /* ── helpers ───────────────────────────────────────────────────────── */
 
