@@ -3,21 +3,21 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #111;
-  --panel: rgba(20, 18, 16, 0.92);
-  --panel-solid: #1c1a18;
-  --surface: rgba(40, 37, 34, 0.7);
-  --orange: #E77500;
-  --orange-dim: rgba(231, 117, 0, 0.15);
-  --orange-glow: rgba(231, 117, 0, 0.3);
-  --text: #e8e4dc;
-  --muted: #9e978e;
-  --dim: #5e5850;
-  --border: rgba(255, 255, 255, 0.06);
-  --r: 8px;
+  --bg: #0e0e10;
+  --panel: rgba(18, 18, 22, 0.88);
+  --panel-solid: #161619;
+  --surface: rgba(255, 255, 255, 0.04);
+  --orange: #E8853A;
+  --orange-dim: rgba(232, 133, 58, 0.12);
+  --orange-glow: rgba(232, 133, 58, 0.25);
+  --text: #ece8e1;
+  --muted: #9a958d;
+  --dim: #55514b;
+  --border: rgba(255, 255, 255, 0.07);
+  --r: 10px;
   --serif: 'DM Serif Display', Georgia, serif;
   --sans: 'DM Sans', system-ui, sans-serif;
-  --ease: 0.3s ease;
+  --ease: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html, body {
@@ -43,10 +43,15 @@ html, body {
 ::selection { background: var(--orange-dim); }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeOut {
   to { opacity: 0; transform: translateY(-16px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

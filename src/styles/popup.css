@@ -1,6 +1,6 @@
 /* Popup — MapLibre overrides + parameter bars */
 
-.maplibregl-popup-content { background: var(--panel-solid) !important; border: 1px solid var(--border) !important; border-radius: var(--r) !important; padding: 0 !important; color: var(--text) !important; font-family: var(--sans) !important; min-width: 260px; max-width: 320px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important; }
+.maplibregl-popup-content { background: var(--panel-solid) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; padding: 0 !important; color: var(--text) !important; font-family: var(--sans) !important; min-width: 260px; max-width: 320px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.03) inset !important; }
 .maplibregl-popup-tip { border-top-color: var(--panel-solid) !important; }
 .maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: var(--panel-solid) !important; }
 .maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--panel-solid) !important; }

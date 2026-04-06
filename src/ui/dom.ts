@@ -317,9 +317,9 @@ function buildDetailsModal(): HTMLElement {
 
 function buildBasemapPicker(): HTMLElement {
   const basemaps: [string, string, string][] = [
-    ['osm', 'Map', 'https://a.basemaps.cartocdn.com/rastertiles/voyager/5/18/16@2x.png'],
+    ['osm', 'Dark', 'https://a.basemaps.cartocdn.com/dark_all/5/18/16@2x.png'],
     ['satellite', 'Satellite', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/5/16/18'],
-    ['topo', 'Terrain', 'https://a.tile.opentopomap.org/5/18/16.png'],
+    ['topo', 'Light', 'https://a.basemaps.cartocdn.com/rastertiles/voyager/5/18/16@2x.png'],
   ];
 
   const picker = el('div', { id: 'basemap-picker', className: 'basemap-picker basemap--stacked' });

@@ -2,10 +2,12 @@
 
 #title-bar {
   position: absolute; top: 16px; left: 16px; z-index: 11;
-  background: var(--panel); backdrop-filter: blur(16px);
+  background: var(--panel); backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
   border: 1px solid var(--border); border-radius: var(--r);
-  padding: 10px 14px;
+  padding: 10px 16px;
   animation: fadeUp 0.5s ease 0.2s backwards;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 #title-bar h1 {
   font: 400 1rem/1.2 var(--serif);

@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: #111;
+  background: #0e0e10;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,8 +81,8 @@
   background: transparent;
   border: 1px solid var(--dim);
   color: var(--text);
-  padding: 11px 28px;
-  border-radius: 3px;
+  padding: 12px 32px;
+  border-radius: 6px;
   font: 500 0.82rem/1 var(--sans);
   letter-spacing: 0.03em;
   cursor: pointer;
@@ -92,4 +92,6 @@
 .btn-enter:hover {
   border-color: var(--orange);
   color: var(--orange);
+  background: var(--orange-dim);
+  box-shadow: 0 0 24px rgba(232, 133, 58, 0.15);
 }

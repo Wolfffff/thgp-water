@@ -7,8 +7,8 @@ import type { StyleSpecification } from 'maplibre-gl';
  */
 export const BASEMAP_TILES: Record<string, { url: string; attribution: string; maxzoom: number }> = {
   osm: {
-    url: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-    attribution: '&copy; <a href="https://carto.com/">CartoDB</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    url: 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxzoom: 20,
   },
   satellite: {
@@ -17,9 +17,9 @@ export const BASEMAP_TILES: Record<string, { url: string; attribution: string; m
     maxzoom: 22,
   },
   topo: {
-    url: 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxzoom: 17,
+    url: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxzoom: 20,
   },
 };
 
