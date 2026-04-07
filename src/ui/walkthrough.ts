@@ -27,7 +27,7 @@ const TOUR_STEPS: TourStep[] = [
     text: 'This interactive map shows water chemistry data from 152 sampling sites across Turkana County, Kenya. Click through to learn how to use it.',
     action: (map, setParam) => {
       setParam?.('EXCEED');
-      map.flyTo({ center: [35.5, 3.5], zoom: 7, duration: 2000 });
+      map.flyTo({ center: [35.5, 3.5], zoom: 6.4, duration: 2000 });
     },
     btnText: 'Next',
   },
@@ -90,7 +90,7 @@ const TOUR_STEPS: TourStep[] = [
     text: 'Click any site to see its full chemistry profile. Use Export Data to download as CSV. Switch basemaps for satellite or terrain views.',
     action: (map, setParam) => {
       setParam?.('EXCEED');
-      map.flyTo({ center: [35.5, 3.5], zoom: 7, duration: 2000, essential: true });
+      map.flyTo({ center: [35.5, 3.5], zoom: 6.4, duration: 2000, essential: true });
     },
     btnText: 'Start Exploring',
   },
