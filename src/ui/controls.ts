@@ -335,7 +335,7 @@ const SOURCE_TYPE_CHECKBOX_MAP: Record<string, string> = {
 let _activeSourceTypes: string[] = Object.values(SOURCE_TYPE_CHECKBOX_MAP);
 let _activeWards: string[] = [];
 let _allWardNames: string[] = [];
-let _minAlerts: number = 0;
+let _alertsMode: 'any' | 'good' | number = 'any';
 
 export function getActiveSourceTypes(): string[] {
   return _activeSourceTypes;
@@ -345,8 +345,8 @@ export function getActiveWards(): string[] {
   return _activeWards;
 }
 
-export function getMinAlerts(): number {
-  return _minAlerts;
+export function getAlertsMode(): 'any' | 'good' | number {
+  return _alertsMode;
 }
 
 /**
@@ -491,7 +491,10 @@ export function initFilters(
     });
 
     const alertsSelect = document.querySelector<HTMLSelectElement>('#alerts-select');
-    _minAlerts = alertsSelect ? parseInt(alertsSelect.value, 10) || 0 : 0;
+    const alertsVal = alertsSelect?.value ?? 'any';
+    if (alertsVal === 'any') _alertsMode = 'any';
+    else if (alertsVal === 'good') _alertsMode = 'good';
+    else _alertsMode = parseInt(alertsVal, 10) || 0;
 
     const filter: any[] = ['all'];
 
@@ -505,9 +508,11 @@ export function initFilters(
       filter.push(['in', ['get', 'ward'], ['literal', _activeWards]]);
     }
 
-    // Min alerts filter (uses pre-computed param_EXCEED)
-    if (_minAlerts > 0) {
-      filter.push(['>=', ['coalesce', ['get', 'param_EXCEED'], 0], _minAlerts]);
+    // Alerts filter (uses pre-computed param_EXCEED)
+    if (_alertsMode === 'good') {
+      filter.push(['==', ['coalesce', ['get', 'param_EXCEED'], 0], 0]);
+    } else if (typeof _alertsMode === 'number' && _alertsMode > 0) {
+      filter.push(['>=', ['coalesce', ['get', 'param_EXCEED'], 0], _alertsMode]);
     }
 
     const filterExpr = filter.length > 1 ? (filter as maplibregl.FilterSpecification) : null;
