@@ -69,7 +69,13 @@ const map = new maplibregl.Map({
   attributionControl: false,
 });
 
-map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-right');
+map.addControl(
+  new maplibregl.ScaleControl({
+    unit: 'metric',
+    maxWidth: window.innerWidth <= 640 ? 70 : 100,
+  }),
+  'bottom-right',
+);
 map.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-right');
 
 /* ── helpers ───────────────────────────────────────────────────────── */
