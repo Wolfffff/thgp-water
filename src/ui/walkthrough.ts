@@ -166,45 +166,77 @@ function runTour(map: Map): void {
       bodyEl.style.opacity = '1';
     }, 150);
 
-    // Run action first (may open sidebar, change params, etc.)
-    if (step.action) step.action(map, _setParam);
-
     const prevHadHighlight = highlight.style.opacity === '1';
     const isMobile = window.innerWidth <= 640;
 
+    // Pre-apply slower easing BEFORE the action runs, since some actions
+    // toggle the drawer themselves and would otherwise use the default speed.
+    const sidebarEl = document.querySelector<HTMLElement>('#sidebar');
+    const wasCollapsed = sidebarEl?.classList.contains('sidebar--collapsed') ?? false;
+    if (sidebarEl && (step.highlight || !isMobile)) {
+      sidebarEl.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
+    }
+
+    // Run action (may open sidebar, change params, etc.)
+    if (step.action) step.action(map, _setParam);
+
     if (step.highlight) {
-      // On mobile: open the drawer for sidebar-targeted steps
-      if (isMobile) {
-        const sidebar = document.querySelector('#sidebar');
-        sidebar?.classList.remove('sidebar--collapsed');
-        // Scroll the target into view inside the drawer
-        setTimeout(() => {
-          const target = $(step.highlight!);
-          target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 350);
+      // Make sure the sidebar is open and any collapsed ancestor sections are expanded
+      const sidebar = sidebarEl;
+      sidebar?.classList.remove('sidebar--collapsed');
+      const target = $(step.highlight);
+      let ancestor = target?.parentElement;
+      while (ancestor) {
+        if (ancestor.classList.contains('section--collapsed')) {
+          ancestor.classList.remove('section--collapsed');
+        }
+        ancestor = ancestor.parentElement;
       }
 
       backdrop.style.opacity = '0';
-      if (!prevHadHighlight) highlight.style.opacity = '0';
 
-      // Wait for drawer/sidebar animation then position highlight
-      setTimeout(() => {
-        const target = $(step.highlight!);
-        if (target) {
-          const rect = target.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
+      // Wait for sidebar to finish opening + sections to expand before measuring.
+      // Longer wait when sidebar was closed (need ~250ms transform animation).
+      const wait = prevHadHighlight ? 60 : (wasCollapsed ? 620 : 200);
+
+      const positionHighlight = () => {
+        const t = $(step.highlight!);
+        if (!t) return;
+        if (isMobile) {
+          t.scrollIntoView({ block: 'center', inline: 'nearest' });
+        }
+        requestAnimationFrame(() => {
+          const rect = t.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0) return;
+
+          if (!prevHadHighlight) {
+            // First appearance: place instantly, then fade in
+            highlight.style.transition = 'none';
             highlight.style.top = `${rect.top - 6}px`;
             highlight.style.left = `${rect.left - 6}px`;
             highlight.style.width = `${rect.width + 12}px`;
             highlight.style.height = `${rect.height + 12}px`;
+            // Force reflow, then re-enable transitions and fade in
+            void highlight.offsetHeight;
+            highlight.style.transition = '';
             highlight.style.opacity = '1';
+          } else {
+            // Already visible: smoothly slide/resize to the new target
+            highlight.style.top = `${rect.top - 6}px`;
+            highlight.style.left = `${rect.left - 6}px`;
+            highlight.style.width = `${rect.width + 12}px`;
+            highlight.style.height = `${rect.height + 12}px`;
           }
-        }
-      }, prevHadHighlight ? 100 : 500);
+        });
+      };
+
+      setTimeout(positionHighlight, wait);
     } else {
       // No highlight — map is the focus, close drawer on mobile
-      if (isMobile) {
-        document.querySelector('#sidebar')?.classList.add('sidebar--collapsed');
+      const sidebar = document.querySelector<HTMLElement>('#sidebar');
+      if (isMobile && sidebar && !sidebar.classList.contains('sidebar--collapsed')) {
+        sidebar.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
+        sidebar.classList.add('sidebar--collapsed');
       }
       highlight.style.opacity = '0';
       backdrop.style.opacity = '0';
@@ -260,6 +292,19 @@ function showIntroThenTour(map: Map): void {
   document.querySelector('.tour-card')?.remove();
   document.querySelector('.tour-backdrop')?.remove();
   document.querySelector('.tour-highlight')?.remove();
+
+  // Collapse the mobile drawer behind the intro overlay so the map is
+  // already clear when the intro fades out and the tour begins.
+  if (window.innerWidth <= 640) {
+    const sidebar = document.querySelector<HTMLElement>('#sidebar');
+    if (sidebar && !sidebar.classList.contains('sidebar--collapsed')) {
+      sidebar.style.transition = 'none';
+      sidebar.classList.add('sidebar--collapsed');
+      // Force reflow then re-enable transitions
+      void sidebar.offsetHeight;
+      sidebar.style.transition = '';
+    }
+  }
 
   // Re-create and insert the intro overlay
   const overlay = buildIntroOverlay();

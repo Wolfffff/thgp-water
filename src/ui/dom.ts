@@ -409,4 +409,9 @@ export function createUI(): void {
       parent.classList.add('section--collapsed');
     }
   });
+
+  // On mobile, the bottom-sheet drawer starts collapsed so the map is visible
+  if (window.innerWidth <= 640) {
+    document.querySelector('#sidebar')?.classList.add('sidebar--collapsed');
+  }
 }

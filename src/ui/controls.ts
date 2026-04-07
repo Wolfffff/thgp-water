@@ -215,23 +215,16 @@ export function initSidebarToggle(): void {
   if (!toggle || !sidebar) return;
 
   toggle.addEventListener('click', () => {
-    const isMobile = window.innerWidth <= 640;
-    if (isMobile) {
-      // Clear any leftover inline styles from dragging
-      sidebar.style.transition = '';
-      sidebar.style.maxHeight = '';
-      sidebar.style.transform = '';
-      sidebar.classList.toggle('sidebar--collapsed');
-    } else {
-      sidebar.classList.toggle('sidebar--collapsed');
-      sidebar.style.transform = '';
-    }
+    // Just toggle the class; CSS handles the animation via transform
+    sidebar.classList.toggle('sidebar--collapsed');
   });
 
   // Mobile: smooth drag to resize bottom sheet — only from the handle
+  const DRAG_THRESHOLD = 8;
   let startY = 0;
   let startX = 0;
   let dragging = false;
+  let dragStarted = false;
   let startHeight = 0;
 
   sidebar.addEventListener('touchstart', (e) => {
@@ -240,22 +233,37 @@ export function initSidebarToggle(): void {
     startY = e.touches[0].clientY;
     startX = e.touches[0].clientX;
     dragging = true;
-    startHeight = sidebar.getBoundingClientRect().height;
-    sidebar.style.transition = 'none';
+    dragStarted = false;
+    // When collapsed, only the 28px handle is visible — start from there so
+    // pulling up reveals the sheet gradually instead of snapping to full height.
+    if (sidebar.classList.contains('sidebar--collapsed')) {
+      startHeight = 28;
+    } else {
+      startHeight = sidebar.getBoundingClientRect().height;
+    }
   }, { passive: true });
 
   sidebar.addEventListener('touchmove', (e) => {
     if (!dragging) return;
     const isMobile = window.innerWidth <= 640;
+    const dy = e.touches[0].clientY - startY;
+    const dx = e.touches[0].clientX - startX;
+
+    // Only start dragging once the user exceeds threshold — otherwise it's a tap
+    if (!dragStarted && Math.abs(dy) < DRAG_THRESHOLD && Math.abs(dx) < DRAG_THRESHOLD) {
+      return;
+    }
+    if (!dragStarted) {
+      dragStarted = true;
+      sidebar.style.transition = 'none';
+    }
 
     if (isMobile) {
-      const dy = e.touches[0].clientY - startY;
       const newHeight = Math.max(28, Math.min(startHeight - dy, window.innerHeight * 0.8));
       sidebar.classList.remove('sidebar--collapsed');
       sidebar.style.maxHeight = `${newHeight}px`;
-      sidebar.style.transform = 'none';
+      sidebar.style.transform = 'translateY(0)';
     } else {
-      const dx = e.touches[0].clientX - startX;
       if (dx > 0 && !sidebar.classList.contains('sidebar--collapsed')) {
         sidebar.style.transform = `translateX(${dx}px)`;
       }
@@ -265,6 +273,10 @@ export function initSidebarToggle(): void {
   sidebar.addEventListener('touchend', (e) => {
     if (!dragging) return;
     dragging = false;
+    // If the user never exceeded the drag threshold, treat it as a tap —
+    // let the click handler toggle the drawer. Don't touch any styles.
+    if (!dragStarted) return;
+
     sidebar.style.transition = '';
     const isMobile = window.innerWidth <= 640;
 
