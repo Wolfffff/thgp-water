@@ -194,7 +194,7 @@ export function addWardLayer(map: Map): void {
     type: 'fill',
     source: 'wards',
     layout: {
-      visibility: 'none',
+      visibility: 'visible',
     },
     paint: {
       'fill-color': 'rgba(0,0,0,0)',
@@ -207,10 +207,10 @@ export function addWardLayer(map: Map): void {
     type: 'line',
     source: 'wards',
     layout: {
-      visibility: 'none',
+      visibility: 'visible',
     },
     paint: {
-      'line-color': '#666666',
+      'line-color': 'rgba(255,255,255,0.45)',
       'line-width': 1,
     },
   });

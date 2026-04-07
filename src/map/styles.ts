@@ -29,7 +29,7 @@ export const BASEMAP_TILES: Record<string, { url: string; attribution: string; m
 };
 
 export type BasemapKey = keyof typeof BASEMAP_TILES;
-export const DEFAULT_BASEMAP: BasemapKey = 'light';
+export const DEFAULT_BASEMAP: BasemapKey = 'satellite';
 
 /**
  * The initial MapLibre style — a single raster source that we swap tiles on.

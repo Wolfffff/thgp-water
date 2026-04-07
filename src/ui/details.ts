@@ -7,7 +7,12 @@ interface SiteValue {
   ratio: number;
   name: string;
   type: string;
+  wpNo: number | null;
+  lon: number;
+  lat: number;
 }
+
+export type SiteClickHandler = (site: { name: string; lon: number; lat: number; wpNo: number | null }) => void;
 
 function fmt(v: number, integer = false): string {
   if (integer || Number.isInteger(v)) return Math.round(v).toString();
@@ -26,6 +31,12 @@ function collectValues(
     const props = f.properties as Record<string, any>;
     if (!props || !activeSourceTypes.includes(props.bh_type)) continue;
 
+    const geom = f.geometry as GeoJSON.Point | undefined;
+    const coords = geom?.coordinates as [number, number] | undefined;
+    if (!coords) continue;
+    const [lon, lat] = coords;
+    const wpNo = typeof props.wp_no === 'number' ? props.wp_no : (props.wp_no != null ? Number(props.wp_no) : null);
+
     if (isExceed) {
       const ratios = props.ratios as Record<string, number | null> | undefined;
       if (!ratios) continue;
@@ -33,7 +44,7 @@ function collectValues(
       for (const v of Object.values(ratios)) {
         if (typeof v === 'number' && v > 1.0) count++;
       }
-      values.push({ value: count, ratio: Math.min(count, 5), name: props.name, type: props.bh_type });
+      values.push({ value: count, ratio: Math.min(count, 5), name: props.name, type: props.bh_type, wpNo, lon, lat });
     } else {
       const params = props.params as Record<string, number | null> | undefined;
       const ratios = props.ratios as Record<string, number | null> | undefined;
@@ -41,7 +52,7 @@ function collectValues(
       const val = params[paramKey];
       if (val == null) continue;
       const ratio = ratios?.[paramKey] ?? 0;
-      values.push({ value: val, ratio: typeof ratio === 'number' ? ratio : 0, name: props.name, type: props.bh_type });
+      values.push({ value: val, ratio: typeof ratio === 'number' ? ratio : 0, name: props.name, type: props.bh_type, wpNo, lon, lat });
     }
   }
 
@@ -219,12 +230,13 @@ function renderTypeBreakdown(
     .text(d => `${d.exceed}/${d.total}`);
 }
 
-/** D3 dot strip — top 15 worst sites */
+/** D3 dot strip — top 15 worst sites, clickable */
 function renderWorstSites(
   container: HTMLElement,
   values: SiteValue[],
   unit: string,
   integer = false,
+  onSiteClick?: SiteClickHandler,
 ): void {
   const worst = values.slice(0, 15);
   if (!worst.length) return;
@@ -233,14 +245,39 @@ function renderWorstSites(
 
   worst.forEach((site, i) => {
     const color = getColorForRatio(site.ratio);
-    const row = div.append('div').attr('class', 'details-site-row')
+    const row = div.append('div')
+      .attr('class', 'details-site-row details-site-row--clickable')
+      .attr('role', 'button')
+      .attr('tabindex', '0')
+      .attr('data-wp-no', site.wpNo != null ? String(site.wpNo) : '')
+      .attr('title', `Zoom to ${site.name}`)
       .style('opacity', '0')
       .style('transform', 'translateX(-8px)');
 
     row.append('span').attr('class', 'details-site-rank').text(`${i + 1}`);
     row.append('span').attr('class', 'details-site-dot').style('background', color);
-    row.append('span').attr('class', 'details-site-name').text(site.name);
+    const nameEl = row.append('span').attr('class', 'details-site-name');
+    nameEl.append('span').attr('class', 'details-site-name-text').text(site.name);
+    if (site.wpNo != null) {
+      nameEl.append('span').attr('class', 'details-site-id').text(`#${site.wpNo}`);
+    }
     row.append('span').attr('class', 'details-site-val').text(`${fmt(site.value, integer)} ${unit}`);
+
+    if (onSiteClick) {
+      const handler = () => onSiteClick({
+        name: site.name,
+        lon: site.lon,
+        lat: site.lat,
+        wpNo: site.wpNo,
+      });
+      row.on('click', handler);
+      row.on('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handler();
+        }
+      });
+    }
 
     row.transition()
       .duration(300)
@@ -254,6 +291,7 @@ export function updateDetails(
   geojson: GeoJSON.FeatureCollection,
   paramKey: string,
   activeSourceTypes: string[],
+  onSiteClick?: SiteClickHandler,
 ): void {
   const container = document.querySelector<HTMLElement>('#details-content');
   const title = document.querySelector<HTMLElement>('#details-title');
@@ -315,5 +353,5 @@ export function updateDetails(
   worstContainer.className = 'details-worst';
   worstSection.appendChild(worstContainer);
   container.appendChild(worstSection);
-  renderWorstSites(worstContainer, values, unit, isExceed);
+  renderWorstSites(worstContainer, values, unit, isExceed, onSiteClick);
 }

@@ -333,9 +333,70 @@ const SOURCE_TYPE_CHECKBOX_MAP: Record<string, string> = {
 };
 
 let _activeSourceTypes: string[] = Object.values(SOURCE_TYPE_CHECKBOX_MAP);
+let _activeWards: string[] = [];
+let _allWardNames: string[] = [];
+let _minAlerts: number = 0;
 
 export function getActiveSourceTypes(): string[] {
   return _activeSourceTypes;
+}
+
+export function getActiveWards(): string[] {
+  return _activeWards;
+}
+
+export function getMinAlerts(): number {
+  return _minAlerts;
+}
+
+/**
+ * Ray-casting point-in-polygon test for a single ring.
+ */
+function pointInRing(lon: number, lat: number, ring: [number, number][]): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    const intersect = ((yi > lat) !== (yj > lat)) &&
+      (lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+/**
+ * Tag every site feature with a `ward` property by point-in-polygon
+ * against the wards GeoJSON. Mutates the sites collection in place.
+ */
+export function tagSitesWithWards(
+  sites: GeoJSON.FeatureCollection,
+  wards: GeoJSON.FeatureCollection,
+): void {
+  for (const site of sites.features) {
+    const props = site.properties ?? (site.properties = {});
+    const geom = site.geometry as GeoJSON.Point | undefined;
+    if (!geom || geom.type !== 'Point') continue;
+    const [lon, lat] = geom.coordinates;
+
+    let assigned: string | null = null;
+    for (const ward of wards.features) {
+      const wname = ward.properties?.name as string | undefined;
+      if (!wname) continue;
+      const wgeom = ward.geometry;
+      if (!wgeom) continue;
+      let hit = false;
+      if (wgeom.type === 'Polygon') {
+        // Outer ring; ignore holes for performance — wards are simple
+        hit = pointInRing(lon, lat, wgeom.coordinates[0] as [number, number][]);
+      } else if (wgeom.type === 'MultiPolygon') {
+        for (const poly of wgeom.coordinates) {
+          if (pointInRing(lon, lat, poly[0] as [number, number][])) { hit = true; break; }
+        }
+      }
+      if (hit) { assigned = wname; break; }
+    }
+    props.ward = assigned ?? '';
+  }
 }
 
 /**
@@ -360,8 +421,61 @@ function getBBox(feature: GeoJSON.Feature): [[number, number], [number, number]]
 export function initFilters(
   map: Map,
   wardsData: GeoJSON.FeatureCollection,
+  sitesData: GeoJSON.FeatureCollection,
   onFilterChange: () => void,
 ): void {
+  // Build a set of ward names that actually contain at least one site
+  const wardsWithSites = new Set<string>();
+  for (const site of sitesData.features) {
+    const w = site.properties?.ward as string | undefined;
+    if (w) wardsWithSites.add(w);
+  }
+  // Populate ward checkboxes from wards data
+  const wardChecksContainer = document.querySelector<HTMLElement>('#ward-checks');
+  const sourceChecksContainer = document.querySelector<HTMLElement>('#source-type-checks');
+  _allWardNames = wardsData.features
+    .map(f => f.properties?.name as string)
+    .filter(name => Boolean(name) && wardsWithSites.has(name))
+    .sort();
+  _activeWards = [..._allWardNames];
+
+  if (wardChecksContainer) {
+    for (const name of _allWardNames) {
+      const id = `filter-ward-${name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`;
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.id = id;
+      input.checked = true;
+      input.dataset.wardName = name;
+      const label = document.createElement('label');
+      label.htmlFor = id;
+      label.textContent = name;
+      const row = document.createElement('div');
+      row.className = 'filter-check toggle-row';
+      row.appendChild(input);
+      row.appendChild(label);
+      wardChecksContainer.appendChild(row);
+    }
+  }
+
+  // Helper: add an "Only" button to a row that selects only this checkbox
+  const addOnlyButton = (row: HTMLElement, container: HTMLElement, applyFn: () => void) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'filter-check-only';
+    btn.textContent = 'Only';
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const myCb = row.querySelector<HTMLInputElement>('input[type="checkbox"]');
+      container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach(cb => {
+        cb.checked = (cb === myCb);
+      });
+      applyFn();
+    });
+    row.appendChild(btn);
+  };
+
   const applyFilter = () => {
     const activeTypes: string[] = [];
     for (const [selector, typeName] of Object.entries(SOURCE_TYPE_CHECKBOX_MAP)) {
@@ -370,17 +484,55 @@ export function initFilters(
     }
     _activeSourceTypes = activeTypes;
 
-    let filter: any[] = ['all'];
+    const wardCbs = wardChecksContainer?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]') ?? [];
+    _activeWards = [];
+    wardCbs.forEach(cb => {
+      if (cb.checked && cb.dataset.wardName) _activeWards.push(cb.dataset.wardName);
+    });
+
+    const alertsSelect = document.querySelector<HTMLSelectElement>('#alerts-select');
+    _minAlerts = alertsSelect ? parseInt(alertsSelect.value, 10) || 0 : 0;
+
+    const filter: any[] = ['all'];
 
     // Source type filter
     if (activeTypes.length < 4) {
       filter.push(['in', ['get', 'bh_type'], ['literal', activeTypes]]);
     }
 
+    // Ward filter — only apply if not all selected
+    if (_activeWards.length < _allWardNames.length) {
+      filter.push(['in', ['get', 'ward'], ['literal', _activeWards]]);
+    }
+
+    // Min alerts filter (uses pre-computed param_EXCEED)
+    if (_minAlerts > 0) {
+      filter.push(['>=', ['coalesce', ['get', 'param_EXCEED'], 0], _minAlerts]);
+    }
+
     const filterExpr = filter.length > 1 ? (filter as maplibregl.FilterSpecification) : null;
     map.setFilter('sites-circles', filterExpr);
     if (map.getLayer('sites-heatmap')) {
       map.setFilter('sites-heatmap', filterExpr);
+    }
+
+    // Update collapsible group summaries
+    const sourceSummary = document.querySelector<HTMLElement>('#source-type-summary');
+    if (sourceSummary) {
+      const total = Object.keys(SOURCE_TYPE_CHECKBOX_MAP).length;
+      sourceSummary.textContent =
+        activeTypes.length === total ? 'All' :
+        activeTypes.length === 0 ? 'None' :
+        activeTypes.length === 1 ? activeTypes[0] :
+        `${activeTypes.length} of ${total}`;
+    }
+    const wardSummary = document.querySelector<HTMLElement>('#ward-summary');
+    if (wardSummary) {
+      wardSummary.textContent =
+        _activeWards.length === _allWardNames.length ? 'All' :
+        _activeWards.length === 0 ? 'None' :
+        _activeWards.length === 1 ? _activeWards[0] :
+        `${_activeWards.length} of ${_allWardNames.length}`;
     }
 
     onFilterChange();
@@ -392,34 +544,58 @@ export function initFilters(
     if (cb) cb.addEventListener('change', applyFilter);
   }
 
-  // Populate ward select
-  const wardSelect = document.querySelector<HTMLSelectElement>('#ward-select');
-  if (wardSelect) {
-    const wardNames = wardsData.features
-      .map(f => f.properties?.name as string)
-      .filter(Boolean)
-      .sort();
-    for (const name of wardNames) {
-      const opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      wardSelect.appendChild(opt);
-    }
+  // Wire up ward checkboxes
+  wardChecksContainer?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', applyFilter);
+  });
 
-    // Ward select: fly to ward bounds
-    wardSelect.addEventListener('change', () => {
-      const name = wardSelect.value;
-      if (name === 'all') {
-        map.flyTo({ center: [35.5, 3.5], zoom: 7, duration: 1000 });
-        return;
-      }
-      const ward = wardsData.features.find(f => f.properties?.name === name);
-      if (ward) {
-        const bbox = getBBox(ward);
-        map.fitBounds(bbox, { padding: 40, duration: 1000 });
-      }
+  // Wire up alerts select
+  const alertsSelect = document.querySelector<HTMLSelectElement>('#alerts-select');
+  if (alertsSelect) alertsSelect.addEventListener('change', applyFilter);
+
+  // Wire up Select All / None buttons
+  document.querySelectorAll<HTMLButtonElement>('[data-filter-all]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.filterAll;
+      const container = target === 'ward'
+        ? wardChecksContainer
+        : document.querySelector<HTMLElement>('#source-type-checks');
+      container?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach(cb => { cb.checked = true; });
+      applyFilter();
+    });
+  });
+  document.querySelectorAll<HTMLButtonElement>('[data-filter-none]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.filterNone;
+      const container = target === 'ward'
+        ? wardChecksContainer
+        : document.querySelector<HTMLElement>('#source-type-checks');
+      container?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach(cb => { cb.checked = false; });
+      applyFilter();
+    });
+  });
+
+  // Inject "Only" hover buttons into every filter row
+  if (sourceChecksContainer) {
+    sourceChecksContainer.querySelectorAll<HTMLElement>('.filter-check').forEach(row => {
+      addOnlyButton(row, sourceChecksContainer, applyFilter);
     });
   }
+  if (wardChecksContainer) {
+    wardChecksContainer.querySelectorAll<HTMLElement>('.filter-check').forEach(row => {
+      addOnlyButton(row, wardChecksContainer, applyFilter);
+    });
+  }
+
+  // Wire up collapsible filter group toggles
+  document.querySelectorAll<HTMLElement>('.filter-group--collapsible .filter-group-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      toggle.closest('.filter-group--collapsible')?.classList.toggle('filter-group--collapsed');
+    });
+  });
+
+  // Initial summary text
+  applyFilter();
 }
 
 // ---------------------------------------------------------------------------

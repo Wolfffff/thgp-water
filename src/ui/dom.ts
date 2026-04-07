@@ -85,7 +85,7 @@ function buildSidebar(): HTMLElement {
   /* Layers — county boundary is always visible, not toggleable */
   const toggles: [string, string, boolean, string][] = [
     ['toggle-heatmap', 'Heatmap', false, 'Spatial density of threshold exceedances'],
-    ['toggle-wards', 'Ward Boundaries', false, 'Turkana County administrative wards'],
+    ['toggle-wards', 'Ward Boundaries', true, 'Turkana County administrative wards'],
   ];
 
   const layerSection = el('div', { className: 'sidebar-section' },
@@ -114,23 +114,51 @@ function buildSidebar(): HTMLElement {
 
   const filterSection = el('div', { className: 'sidebar-section' },
     el('h4', {}, 'Filters'),
-    el('div', { className: 'filter-group' },
-      el('label', { className: 'filter-label' }, 'Source Type'),
-      el('div', { className: 'filter-checks' },
-        ...filterChecks.map(([id, text, checked]) => {
-          const input = el('input', { type: 'checkbox', id });
-          if (checked) input.checked = true;
-          return el('div', { className: 'filter-check toggle-row' },
-            input,
-            el('label', { for: id }, text),
-          );
-        }),
+    el('div', { className: 'filter-group filter-group--collapsible filter-group--collapsed' },
+      el('button', { type: 'button', className: 'filter-group-toggle' },
+        el('span', { className: 'filter-label' }, 'Source Type'),
+        el('span', { className: 'filter-group-summary', id: 'source-type-summary' }, 'All'),
+        el('span', { className: 'filter-group-chevron' }, '\u25BE'),
+      ),
+      el('div', { className: 'filter-group-body' },
+        el('div', { className: 'filter-actions' },
+          el('button', { type: 'button', className: 'filter-action-btn', 'data-filter-all': 'source' }, 'All'),
+          el('button', { type: 'button', className: 'filter-action-btn', 'data-filter-none': 'source' }, 'None'),
+        ),
+        el('div', { className: 'filter-checks', id: 'source-type-checks' },
+          ...filterChecks.map(([id, text, checked]) => {
+            const input = el('input', { type: 'checkbox', id });
+            if (checked) input.checked = true;
+            return el('div', { className: 'filter-check toggle-row' },
+              input,
+              el('label', { for: id }, text),
+            );
+          }),
+        ),
+      ),
+    ),
+    el('div', { className: 'filter-group filter-group--collapsible filter-group--collapsed' },
+      el('button', { type: 'button', className: 'filter-group-toggle' },
+        el('span', { className: 'filter-label' }, 'Wards'),
+        el('span', { className: 'filter-group-summary', id: 'ward-summary' }, 'All'),
+        el('span', { className: 'filter-group-chevron' }, '\u25BE'),
+      ),
+      el('div', { className: 'filter-group-body' },
+        el('div', { className: 'filter-actions' },
+          el('button', { type: 'button', className: 'filter-action-btn', 'data-filter-all': 'ward' }, 'All'),
+          el('button', { type: 'button', className: 'filter-action-btn', 'data-filter-none': 'ward' }, 'None'),
+        ),
+        el('div', { className: 'filter-checks filter-checks--scroll', id: 'ward-checks' }),
       ),
     ),
     el('div', { className: 'filter-group' },
-      el('label', { className: 'filter-label' }, 'Ward'),
-      el('select', { id: 'ward-select' },
-        el('option', { value: 'all' }, 'All Wards'),
+      el('label', { className: 'filter-label' }, 'Min. Alerts'),
+      el('select', { id: 'alerts-select' },
+        el('option', { value: '0' }, 'Any (show all)'),
+        el('option', { value: '1' }, '1 or more'),
+        el('option', { value: '2' }, '2 or more'),
+        el('option', { value: '3' }, '3 or more'),
+        el('option', { value: '5' }, '5 or more'),
       ),
     ),
   );
@@ -328,7 +356,7 @@ function buildBasemapPicker(): HTMLElement {
   // Tile options
   for (const [key, label, thumb] of basemaps) {
     const btn = el('button', {
-      className: key === 'light' ? 'basemap-option basemap-option--active' : 'basemap-option',
+      className: key === 'satellite' ? 'basemap-option basemap-option--active' : 'basemap-option',
       'data-basemap': key,
     },
       el('img', { src: thumb, alt: label, className: 'basemap-thumb' }),

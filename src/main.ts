@@ -38,6 +38,7 @@ import {
   initColorModeToggle,
   initFilters,
   getActiveSourceTypes,
+  tagSitesWithWards,
 } from './ui/controls';
 import { updateLegend, initSourceTypeLegend, showSourceTypeLegend } from './ui/legend';
 import { colorBySourceType } from './map/layers';
@@ -209,7 +210,9 @@ map.on('load', async () => {
     return;
   }
 
-  /* Flatten nested properties for MapLibre expressions */
+  /* Tag each site with its containing ward (point-in-polygon), then
+     flatten nested properties for MapLibre paint/filter expressions. */
+  tagSitesWithWards(sites, wards);
   flattenFeatureProperties(sites);
   sitesData = sites;
 
@@ -280,7 +283,7 @@ map.on('load', async () => {
   initExportButton(map);
 
   /* ── filters ─────────────────────────────────────────────────────── */
-  initFilters(map, wards, () => {
+  initFilters(map, wards, sites, () => {
     if (sitesData) {
       const activeTypes = getActiveSourceTypes();
       const filtered: GeoJSON.FeatureCollection = {
@@ -301,9 +304,13 @@ map.on('load', async () => {
   const detailsBtn = document.querySelector<HTMLElement>('#details-btn');
 
   if (detailsOverlay && detailsClose && detailsBtn) {
+    const onDetailsSiteClick = (site: { name: string; lon: number; lat: number; wpNo: number | null }) => {
+      detailsOverlay.classList.add('hidden');
+      zoomToSite(site.lon, site.lat, site.name);
+    };
     detailsBtn.addEventListener('click', () => {
       if (sitesData) {
-        updateDetails(sitesData, currentParam, getActiveSourceTypes());
+        updateDetails(sitesData, currentParam, getActiveSourceTypes(), onDetailsSiteClick);
       }
       detailsOverlay.classList.remove('hidden');
     });

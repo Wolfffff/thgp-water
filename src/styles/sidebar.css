@@ -131,12 +131,78 @@
 
 /* ── Filters ── */
 
-.filter-group { margin-bottom: 8px; }
+.filter-group { margin-bottom: 10px; }
 .filter-label {
   font: 500 0.7rem/1 var(--sans);
   color: var(--muted); display: block; margin-bottom: 4px;
 }
-.filter-checks { display: flex; flex-direction: column; gap: 2px; }
+
+/* Collapsible filter group */
+.filter-group--collapsible { margin-bottom: 6px; }
+.filter-group-toggle {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 7px 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; cursor: pointer;
+  font: 500 0.72rem/1 var(--sans); color: var(--text);
+  transition: border-color var(--ease), color var(--ease);
+}
+.filter-group-toggle:hover { border-color: var(--orange); color: var(--orange); }
+.filter-group-toggle .filter-label { margin: 0; flex-shrink: 0; }
+.filter-group-summary {
+  flex: 1; text-align: right;
+  font: 400 0.68rem/1 var(--sans); color: var(--dim);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.filter-group-chevron {
+  font-size: 0.55rem; color: var(--dim);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+.filter-group--collapsed .filter-group-chevron { transform: rotate(-90deg); }
+.filter-group-body {
+  padding: 8px 4px 4px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.filter-group--collapsed .filter-group-body { display: none; }
+
+.filter-actions { display: flex; gap: 4px; padding: 0 6px; }
+.filter-action-btn {
+  font: 500 0.62rem/1 var(--sans); color: var(--dim);
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 3px; padding: 3px 7px; cursor: pointer;
+  transition: all var(--ease);
+}
+.filter-action-btn:hover { color: var(--orange); border-color: var(--orange); }
+
+.filter-checks { display: flex; flex-direction: column; gap: 1px; }
+.filter-checks--scroll {
+  max-height: 200px; overflow-y: auto;
+  padding: 4px; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--surface);
+}
+
+/* "Only" hover button on each filter row */
+.filter-check {
+  position: relative;
+  padding: 3px 6px 3px 4px;
+  border-radius: 3px;
+  transition: background var(--ease);
+}
+.filter-check:hover { background: rgba(255,255,255,0.04); }
+.filter-check label { flex: 1; }
+.filter-check-only {
+  opacity: 0; pointer-events: none;
+  font: 600 0.6rem/1 var(--sans); color: var(--orange);
+  background: var(--orange-dim); border: 1px solid rgba(232,133,58,0.3);
+  border-radius: 3px; padding: 2px 6px; cursor: pointer;
+  transition: opacity var(--ease);
+  margin-left: auto;
+}
+.filter-check:hover .filter-check-only {
+  opacity: 1; pointer-events: auto;
+}
+.filter-check-only:hover { background: var(--orange); color: #fff; }
 .filter-check label {
   font: 400 0.75rem/1 var(--sans); color: var(--text); cursor: pointer;
   transition: color var(--ease);
