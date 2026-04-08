@@ -24,7 +24,7 @@ interface TourStep {
 const TOUR_STEPS: TourStep[] = [
   {
     title: 'Welcome to Turkana Water Quality',
-    text: 'This interactive map shows water chemistry data from 152 sampling sites across Turkana County, Kenya. Click through to learn how to use it.',
+    text: 'This interactive map shows water chemistry data from 153 sampling sites across Turkana County, Kenya. Click through to learn how to use it.',
     action: (map, setParam) => {
       setParam?.('EXCEED');
       map.flyTo({ center: [35.5, 3.5], zoom: 6.4, duration: 2000 });

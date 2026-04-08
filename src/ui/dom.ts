@@ -33,8 +33,8 @@ function el<K extends keyof HTMLElementTagNameMap>(
 
 export function buildIntroOverlay(): HTMLElement {
   const statData: [string, string][] = [
-    ['152', 'Sites'],
-    ['48', 'Parameters'],
+    ['153', 'Sites'],
+    ['52', 'Parameters'],
     ['23', 'Wards'],
   ];
 
@@ -277,13 +277,13 @@ function buildAboutModal(): HTMLElement {
     el('button', { id: 'about-close', className: 'close-btn', 'aria-label': 'Close' }, '\u00D7'),
     el('h2', {}, 'About This Map'),
     el('p', { className: 'about-description' },
-      'Interactive map analyzing 152 water sources across Turkana County, Kenya for 48 physical-chemical parameters.',
+      'Interactive map analyzing 153 water sources across Turkana County, Kenya for 52 physical-chemical parameters.',
     ),
     el('h3', {}, 'Authors'),
     authorsList,
     el('h3', {}, 'Data'),
     el('p', {},
-      '152 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against the WHO Guidelines for Drinking-water Quality. Turkana County boundary and ward outlines from IEBC, distributed via UN OCHA HDX (kenya-admin-level-3-wards).',
+      '153 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against the WHO Guidelines for Drinking-water Quality. Turkana County boundary and ward outlines from IEBC, distributed via UN OCHA HDX (kenya-admin-level-3-wards).',
     ),
     el('h3', {}, 'Source Types'),
     sourceList,
