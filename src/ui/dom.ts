@@ -266,7 +266,7 @@ function buildAboutModal(): HTMLElement {
     authorsList,
     el('h3', {}, 'Data'),
     el('p', {},
-      '152 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against WHO Guidelines for Drinking-water Quality and Kenya Bureau of Standards KS 459-1:2007.',
+      '152 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against the WHO Guidelines for Drinking-water Quality. Turkana County boundary from UN OCHA HDX (KEN COD-AB, 2019).',
     ),
     el('h3', {}, 'Source Types'),
     sourceList,

@@ -13,6 +13,7 @@ export function updateLegend(paramKey: string): void {
   const isExceed = paramKey === 'EXCEED';
   const param = isExceed ? null : SELECTABLE_PARAMETERS.find((p) => p.key === paramKey);
   if (!isExceed && !param) return;
+  const isRelative = !isExceed && param!.threshold === null;
 
   if (heading) heading.textContent = isExceed ? 'Thresholds Exceeded' : param!.displayName;
 
@@ -30,6 +31,16 @@ export function updateLegend(paramKey: string): void {
       { label: '2', pos: '50%' },
       { label: '3', pos: '75%' },
       { label: '5+', pos: '100%' },
+    ];
+  } else if (isRelative) {
+    // No threshold — relative magnitude. Use the same gradient as the
+    // threshold version so it looks visually consistent, but ticks read
+    // as Low / Mid / High instead of multiplier values.
+    gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[0]} 5%, ${c[1]} 12%, ${c[2]} 22%, ${c[3]} 38%, ${c[4]} 65%, ${c[5]} 100%)`;
+    ticks = [
+      { label: 'Low', pos: '0%' },
+      { label: 'Mid', pos: '50%' },
+      { label: 'High', pos: '100%' },
     ];
   } else {
     gradient = `linear-gradient(to right, ${c[0]} 0%, ${c[0]} 5%, ${c[1]} 12%, ${c[2]} 22%, ${c[3]} 38%, ${c[4]} 65%, ${c[5]} 100%)`;
@@ -65,18 +76,26 @@ export function updateLegend(paramKey: string): void {
   // Safe / Exceeds labels + No data — single row
   const labelRow = document.createElement('div');
   labelRow.className = 'legend-labels';
+  const noDataSwatch = `<span class="legend-no-data"><span class="legend-swatch" style="background:${NO_DATA_COLOR};width:10px;height:10px;display:inline-block;border-radius:2px;vertical-align:middle;margin-right:4px"></span>No data</span>`;
   if (isExceed) {
-    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">None</span><span class="legend-no-data"><span class="legend-swatch" style="background:${NO_DATA_COLOR};width:10px;height:10px;display:inline-block;border-radius:2px;vertical-align:middle;margin-right:4px"></span>No data</span><span style="color:${RATIO_COLORS[3].color}">Many</span>`;
+    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">None</span>${noDataSwatch}<span style="color:${RATIO_COLORS[3].color}">Many</span>`;
+  } else if (isRelative) {
+    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">Lowest</span>${noDataSwatch}<span style="color:${RATIO_COLORS[2].color}">Highest</span>`;
   } else {
-    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">Safe</span><span class="legend-no-data"><span class="legend-swatch" style="background:${NO_DATA_COLOR};width:10px;height:10px;display:inline-block;border-radius:2px;vertical-align:middle;margin-right:4px"></span>No data</span><span style="color:${RATIO_COLORS[3].color}">Exceeds</span>`;
+    labelRow.innerHTML = `<span style="color:${RATIO_COLORS[0].color}">Safe</span>${noDataSwatch}<span style="color:${RATIO_COLORS[3].color}">Exceeds</span>`;
   }
   container.appendChild(labelRow);
 
-  // Threshold info
+  // Threshold / scale info
   if (isExceed) {
     const info = document.createElement('div');
     info.className = 'legend-threshold';
     info.textContent = 'Count of WHO/KS thresholds exceeded per site';
+    container.appendChild(info);
+  } else if (isRelative) {
+    const info = document.createElement('div');
+    info.className = 'legend-threshold';
+    info.textContent = 'No drinking-water threshold — colored by relative magnitude';
     container.appendChild(info);
   } else if (param && param.threshold !== null) {
     const info = document.createElement('div');

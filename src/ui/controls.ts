@@ -26,8 +26,11 @@ export function initParameterSelect(
   sep.textContent = '────────────────';
   select.appendChild(sep);
 
-  // Populate parameter options
-  for (const param of SELECTABLE_PARAMETERS) {
+  // Populate parameter options — sorted alphabetically by display name
+  const sortedParams = [...SELECTABLE_PARAMETERS].sort((a, b) =>
+    a.displayName.localeCompare(b.displayName),
+  );
+  for (const param of sortedParams) {
     const option = document.createElement('option');
     option.value = param.key;
     option.textContent = param.displayName;

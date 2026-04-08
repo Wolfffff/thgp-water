@@ -27,6 +27,7 @@ import {
   updateSitesParameter,
 } from './map/layers';
 import { generatePopupHTML } from './map/popups';
+import { PARAMETERS } from './data/parameters';
 import {
   initParameterSelect,
   initBasemapSelect,
@@ -86,28 +87,74 @@ map.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-ri
  * via simple `['get', 'ratio_F']` / `['get', 'param_F']`.
  */
 function flattenFeatureProperties(geojson: GeoJSON.FeatureCollection): void {
+  // Threshold lookup for parameters that have one.
+  const thresholds: Record<string, number> = {};
+  // Keys of selectable parameters that have NO threshold (relative coloring).
+  const noThresholdKeys: string[] = [];
+  for (const p of PARAMETERS) {
+    if (p.threshold !== null) thresholds[p.key] = p.threshold;
+    else noThresholdKeys.push(p.key);
+  }
+
+  // First pass: per-key max across all sites, so we can normalize
+  // relative-magnitude ratios for null-threshold params.
+  const maxByKey: Record<string, number> = {};
+  for (const feature of geojson.features) {
+    const params = feature.properties?.params as Record<string, number | null> | undefined;
+    if (!params) continue;
+    for (const key of noThresholdKeys) {
+      const v = params[key];
+      if (typeof v === 'number' && Number.isFinite(v)) {
+        if (maxByKey[key] === undefined || v > maxByKey[key]) maxByKey[key] = v;
+      }
+    }
+  }
+
   for (const feature of geojson.features) {
     const props = feature.properties;
     if (!props) continue;
 
-    // Count how many thresholds this site exceeds
-    let exceedCount = 0;
+    const ratios = (props.ratios && typeof props.ratios === 'object')
+      ? props.ratios as Record<string, number | null>
+      : (props.ratios = {} as Record<string, number | null>);
+    const params = (props.params && typeof props.params === 'object')
+      ? props.params as Record<string, number | null>
+      : null;
 
-    if (props.ratios && typeof props.ratios === 'object') {
-      for (const [key, val] of Object.entries(props.ratios)) {
-        props['ratio_' + key] = val;
-        if (typeof val === 'number' && val > 1.0) exceedCount++;
+    if (params) {
+      // Backfill threshold-based ratios for params declared in code but
+      // missing from the precomputed ratios object.
+      for (const [key, threshold] of Object.entries(thresholds)) {
+        if (ratios[key] == null && typeof params[key] === 'number' && threshold > 0) {
+          ratios[key] = (params[key] as number) / threshold;
+        }
+      }
+      // Synthesize a relative-magnitude ratio for null-threshold params.
+      // Map (value / data-max) into the full 0–5 ratio range so the same
+      // color ramp + legend gradient is reused: lowest sample → green,
+      // highest sample → deep red.
+      for (const key of noThresholdKeys) {
+        const v = params[key];
+        const maxV = maxByKey[key];
+        if (typeof v === 'number' && Number.isFinite(v) && maxV && maxV > 0) {
+          ratios[key] = (v / maxV) * 5;
+        }
       }
     }
-    if (props.params && typeof props.params === 'object') {
-      for (const [key, val] of Object.entries(props.params)) {
+
+    // Count how many *real-threshold* exceedances this site has.
+    let exceedCount = 0;
+    for (const [key, val] of Object.entries(ratios)) {
+      props['ratio_' + key] = val;
+      if (key in thresholds && typeof val === 'number' && val > 1.0) exceedCount++;
+    }
+    if (params) {
+      for (const [key, val] of Object.entries(params)) {
         props['param_' + key] = val;
       }
     }
 
-    // Store exceedance count as a pseudo-parameter
     props['param_EXCEED'] = exceedCount;
-    // Normalize to a ratio scale: 0 exceed = 0, 5+ exceed = 5
     props['ratio_EXCEED'] = Math.min(exceedCount, 5);
   }
 }
@@ -241,7 +288,7 @@ map.on('load', async () => {
 
     const html = generatePopupHTML(props as Record<string, any>, currentParam);
 
-    new maplibregl.Popup({ maxWidth: '360px' })
+    new maplibregl.Popup({ maxWidth: '360px', anchor: 'bottom', closeOnMove: false, closeOnClick: true })
       .setLngLat(coords)
       .setHTML(html)
       .addTo(map);
@@ -268,7 +315,7 @@ map.on('load', async () => {
       const props = parseClickProperties(match.properties as Record<string, unknown>);
       const html = generatePopupHTML(props as Record<string, any>, currentParam);
       setTimeout(() => {
-        new maplibregl.Popup({ maxWidth: '360px' })
+        new maplibregl.Popup({ maxWidth: '360px', anchor: 'bottom', closeOnMove: false, closeOnClick: true })
           .setLngLat([lon, lat])
           .setHTML(html)
           .addTo(map);

@@ -38,7 +38,8 @@ export const PARAMETERS: ParameterMeta[] = [
   { key: 'U',     displayName: 'Uranium (U)',                      unit: 'ppb', csvColumn: 'U (ppb)',         threshold: 30,     thresholdUnit: 'ppb', thresholdBody: 'WHO',   category: 'trace'         },
   { key: 'Zn',    displayName: 'Zinc (Zn)',                        unit: 'ppb', csvColumn: 'Zn (ppb)',        threshold: 5000,   thresholdUnit: 'ppb', thresholdBody: 'KS',    category: 'trace'         },
 
-  // --- No threshold (informational only) ---
+  // --- No threshold (informational only — still selectable in the UI) ---
+  { key: 'Cond',  displayName: 'Conductivity',                     unit: 'µS/cm', csvColumn: 'Cond (uS/cm)', threshold: null,   thresholdUnit: null,  thresholdBody: null,    category: 'physical'      },
   { key: 'K',     displayName: 'Potassium (K)',                    unit: 'ppb', csvColumn: 'K (ppb)',         threshold: null,   thresholdUnit: null,  thresholdBody: null,    category: 'major'         },
   { key: 'Li',    displayName: 'Lithium (Li)',                     unit: 'ppb', csvColumn: 'Li (ppb)',        threshold: null,   thresholdUnit: null,  thresholdBody: null,    category: 'trace'         },
   { key: 'Rb',    displayName: 'Rubidium (Rb)',                    unit: 'ppb', csvColumn: 'Rb (ppb)',        threshold: null,   thresholdUnit: null,  thresholdBody: null,    category: 'trace'         },
@@ -46,9 +47,8 @@ export const PARAMETERS: ParameterMeta[] = [
 ];
 
 /**
- * Parameters that have a defined threshold -- these appear in the UI dropdown
- * for selecting which parameter to visualize on the map.
+ * Parameters shown in the UI dropdown for visualization on the map.
+ * Includes all measured parameters; those without a threshold are colored
+ * by relative magnitude (data-driven percentiles) instead of by ratio.
  */
-export const SELECTABLE_PARAMETERS: ParameterMeta[] = PARAMETERS.filter(
-  (p) => p.threshold !== null,
-);
+export const SELECTABLE_PARAMETERS: ParameterMeta[] = PARAMETERS;

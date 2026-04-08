@@ -2,12 +2,12 @@ import { getColorForRatio, NO_DATA_COLOR } from '../utils/colors';
 import { PARAMETERS } from '../data/parameters';
 
 // ---------------------------------------------------------------------------
-// Key parameters to always show in popups (in display order)
+// All parameters shown in popups, alphabetical by display name.
 // ---------------------------------------------------------------------------
 
-const POPUP_PARAM_KEYS = [
-  'F', 'TDS', 'pH', 'As', 'Na', 'Mn', 'Pb', 'Fe', 'U', 'NO3', 'Cl', 'SO4',
-];
+const POPUP_PARAM_KEYS = [...PARAMETERS]
+  .sort((a, b) => a.displayName.localeCompare(b.displayName))
+  .map((p) => p.key);
 
 // Quick lookup from key to ParameterMeta
 const PARAM_BY_KEY = new Map(PARAMETERS.map((p) => [p.key, p]));
@@ -76,6 +76,7 @@ export function generatePopupHTML(
       const ratios = properties.ratios as Record<string, number | null> | undefined;
       const value: number | null = params?.[key] ?? null;
       const ratio: number | null = ratios?.[key] ?? null;
+      const hasThreshold = meta.threshold !== null;
       const isSelected = key === parameterKey;
 
       // Bar width: ratio mapped to 0-100%, where 5x = 100%
@@ -85,17 +86,19 @@ export function generatePopupHTML(
       // Threshold line position (1.0x ratio sits at 20% = 1/5)
       const thresholdPct = 20;
 
-      // Value label
+      // Value label — only show the ratio multiplier when a real threshold exists.
       const valueStr = formatValue(value, meta.unit);
-      const ratioStr = ratio !== null ? ` (${ratio < 10 ? ratio.toFixed(1) : ratio.toFixed(0)}x)` : '';
-      const displayValue = ratio !== null ? `${valueStr}${ratioStr}` : '\u2014';
+      const ratioStr = (hasThreshold && ratio !== null)
+        ? ` (${ratio < 10 ? ratio.toFixed(1) : ratio.toFixed(0)}x)`
+        : '';
+      const displayValue = value !== null ? `${valueStr}${ratioStr}` : '\u2014';
 
       return `
       <div class="popup-param${isSelected ? ' popup-param--selected' : ''}">
         <span class="param-name">${meta.displayName}</span>
         <div class="param-bar-container">
           <div class="param-bar" style="width:${barPct.toFixed(1)}%;background:${barColor}"></div>
-          <div class="param-threshold-line" style="left:${thresholdPct}%"></div>
+          ${hasThreshold ? `<div class="param-threshold-line" style="left:${thresholdPct}%"></div>` : ''}
         </div>
         <span class="param-value">${displayValue}</span>
       </div>`;

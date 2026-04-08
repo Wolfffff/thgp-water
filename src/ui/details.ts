@@ -159,13 +159,14 @@ function renderTypeBreakdown(
   container: HTMLElement,
   values: SiteValue[],
   unit: string,
+  hasThreshold: boolean = true,
 ): void {
   const byType: Record<string, { total: number; exceed: number; sum: number }> = {};
   for (const v of values) {
     if (!byType[v.type]) byType[v.type] = { total: 0, exceed: 0, sum: 0 };
     byType[v.type].total++;
     byType[v.type].sum += v.value;
-    if (v.ratio > 1.0) byType[v.type].exceed++;
+    if (hasThreshold && v.ratio > 1.0) byType[v.type].exceed++;
   }
 
   const data = Object.entries(byType)
@@ -299,6 +300,7 @@ export function updateDetails(
 
   const isExceed = paramKey === 'EXCEED';
   const param = isExceed ? null : SELECTABLE_PARAMETERS.find(p => p.key === paramKey);
+  const hasThreshold = isExceed || (param?.threshold != null);
 
   if (title) {
     title.textContent = isExceed ? 'Threshold Alert Details' : (param?.displayName ?? paramKey);
@@ -306,10 +308,13 @@ export function updateDetails(
 
   const values = collectValues(geojson, paramKey, activeSourceTypes);
   const total = values.length;
-  const exceeding = values.filter(v => v.ratio > 1.0).length;
+  // Only count "exceeding" when there's a real threshold; otherwise the
+  // synthetic relative-magnitude ratio would falsely flag values > 0.2*max.
+  const exceeding = hasThreshold ? values.filter(v => v.ratio > 1.0).length : 0;
   const exceedPct = total > 0 ? Math.round((exceeding / total) * 100) : 0;
   const sorted = [...values.map(v => v.value)].sort((a, b) => a - b);
   const median = sorted.length > 0 ? sorted[Math.floor(sorted.length / 2)] : 0;
+  const maxVal = sorted.length > 0 ? sorted[sorted.length - 1] : 0;
 
   const unit = isExceed ? 'alerts' : (param?.unit ?? '');
   const threshold = isExceed ? null : (param?.threshold ?? null);
@@ -317,15 +322,24 @@ export function updateDetails(
   // Clear and rebuild
   container.innerHTML = '';
 
-  // Stats grid
+  // Stats grid — swap Exceed/Rate columns for Max when no threshold
   const statsGrid = document.createElement('div');
   statsGrid.className = 'details-stats-grid';
-  statsGrid.innerHTML = `
-    <div class="details-stat"><span class="details-stat-val">${total}</span><span class="details-stat-label">Sites</span></div>
-    <div class="details-stat"><span class="details-stat-val">${exceeding}</span><span class="details-stat-label">Exceed</span></div>
-    <div class="details-stat"><span class="details-stat-val">${exceedPct}%</span><span class="details-stat-label">Rate</span></div>
-    <div class="details-stat"><span class="details-stat-val">${fmt(median, isExceed)}</span><span class="details-stat-label">Median</span></div>
-  `;
+  if (hasThreshold) {
+    statsGrid.innerHTML = `
+      <div class="details-stat"><span class="details-stat-val">${total}</span><span class="details-stat-label">Sites</span></div>
+      <div class="details-stat"><span class="details-stat-val">${exceeding}</span><span class="details-stat-label">Exceed</span></div>
+      <div class="details-stat"><span class="details-stat-val">${exceedPct}%</span><span class="details-stat-label">Rate</span></div>
+      <div class="details-stat"><span class="details-stat-val">${fmt(median, isExceed)}</span><span class="details-stat-label">Median</span></div>
+    `;
+  } else {
+    statsGrid.innerHTML = `
+      <div class="details-stat"><span class="details-stat-val">${total}</span><span class="details-stat-label">Sites</span></div>
+      <div class="details-stat"><span class="details-stat-val">${fmt(median)}</span><span class="details-stat-label">Median</span></div>
+      <div class="details-stat"><span class="details-stat-val">${fmt(maxVal)}</span><span class="details-stat-label">Max</span></div>
+      <div class="details-stat" style="grid-column:span 1"><span class="details-stat-val" style="font-size:0.7rem;color:var(--muted)">no threshold</span><span class="details-stat-label">${unit || '—'}</span></div>
+    `;
+  }
   container.appendChild(statsGrid);
 
   // D3 Histogram
@@ -335,7 +349,7 @@ export function updateDetails(
   histContainer.className = 'details-chart';
   histSection.appendChild(histContainer);
   container.appendChild(histSection);
-  renderHistogram(histContainer, values, unit, threshold, isExceed);
+  renderHistogram(histContainer, values, unit, hasThreshold ? threshold : null, isExceed);
 
   // D3 Source type breakdown
   const typeSection = document.createElement('div');
@@ -344,7 +358,7 @@ export function updateDetails(
   typeContainer.className = 'details-chart';
   typeSection.appendChild(typeContainer);
   container.appendChild(typeSection);
-  renderTypeBreakdown(typeContainer, values, unit);
+  renderTypeBreakdown(typeContainer, values, unit, hasThreshold);
 
   // Worst sites with animated entrance
   const worstSection = document.createElement('div');
