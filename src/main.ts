@@ -99,8 +99,9 @@ function flattenFeatureProperties(geojson: GeoJSON.FeatureCollection): void {
     else noThresholdKeys.push(p.key);
   }
 
-  // First pass: per-key max across all sites, so we can normalize
-  // relative-magnitude ratios for null-threshold params.
+  // First pass: per-key min/max across all sites, so we can normalize
+  // relative-magnitude values for null-threshold params over the data range.
+  const minByKey: Record<string, number> = {};
   const maxByKey: Record<string, number> = {};
   for (const feature of geojson.features) {
     const params = feature.properties?.params as Record<string, number | null> | undefined;
@@ -108,6 +109,7 @@ function flattenFeatureProperties(geojson: GeoJSON.FeatureCollection): void {
     for (const key of noThresholdKeys) {
       const v = params[key];
       if (typeof v === 'number' && Number.isFinite(v)) {
+        if (minByKey[key] === undefined || v < minByKey[key]) minByKey[key] = v;
         if (maxByKey[key] === undefined || v > maxByKey[key]) maxByKey[key] = v;
       }
     }
@@ -134,13 +136,15 @@ function flattenFeatureProperties(geojson: GeoJSON.FeatureCollection): void {
       }
       // Synthesize a SEPARATE relative-magnitude value (relmag_X) for
       // null-threshold params. Stored under its own key so it never pollutes
-      // ratios used for exceedance counting. Maps (value / data-max) into
-      // the 0–5 range so the existing color ramp is reused.
+      // ratios used for exceedance counting. Normalize over the actual data
+      // RANGE so the lowest sample → 0 (green) and the highest → 5 (red).
       for (const key of noThresholdKeys) {
         const v = params[key];
+        const minV = minByKey[key];
         const maxV = maxByKey[key];
-        if (typeof v === 'number' && Number.isFinite(v) && maxV && maxV > 0) {
-          props['relmag_' + key] = (v / maxV) * 5;
+        if (typeof v === 'number' && Number.isFinite(v) && minV !== undefined && maxV !== undefined) {
+          const span = maxV - minV;
+          props['relmag_' + key] = span > 0 ? ((v - minV) / span) * 5 : 0;
         }
       }
     }
