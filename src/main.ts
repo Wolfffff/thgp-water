@@ -21,7 +21,6 @@ import {
   addHeatmapLayer,
   addBoundaryLayer,
   addWardLayer,
-  addKenyaMaskLayer,
   addTurkanaMaskLayer,
   createInvertedMask,
   updateSitesParameter,
@@ -198,17 +197,15 @@ function parseClickProperties(
 function addSourcesAndLayers(
   boundary: GeoJSON.FeatureCollection,
   wards: GeoJSON.FeatureCollection,
-  kenya: GeoJSON.FeatureCollection,
+  maskShape: GeoJSON.FeatureCollection,
 ): void {
   // Guard: skip if layers already exist
   if (map.getLayer('sites-circles')) return;
 
   try {
     // Sources — only add if missing
-    if (!map.getSource('kenya'))
-      map.addSource('kenya', { type: 'geojson', data: kenya });
     if (!map.getSource('turkana-mask'))
-      map.addSource('turkana-mask', { type: 'geojson', data: createInvertedMask(boundary) });
+      map.addSource('turkana-mask', { type: 'geojson', data: createInvertedMask(maskShape) });
     if (!map.getSource('sites') && sitesData)
       map.addSource('sites', { type: 'geojson', data: sitesData });
     if (!map.getSource('boundary'))
@@ -218,7 +215,6 @@ function addSourcesAndLayers(
 
     // Layers (order: mask first, then data on top)
     addTurkanaMaskLayer(map);
-    addKenyaMaskLayer(map);
     addBoundaryLayer(map);
     addWardLayer(map);
     addHeatmapLayer(map);
@@ -229,7 +225,7 @@ function addSourcesAndLayers(
     console.warn('Layer add failed, retrying:', err);
     setTimeout(() => {
       if (!map.getLayer('sites-circles') && map.isStyleLoaded()) {
-        addSourcesAndLayers(boundary, wards, kenya);
+        addSourcesAndLayers(boundary, wards, maskShape);
       }
     }, 300);
   }
@@ -242,25 +238,24 @@ map.on('load', async () => {
   let sites: GeoJSON.FeatureCollection;
   let boundary: GeoJSON.FeatureCollection;
   let wards: GeoJSON.FeatureCollection;
-  let kenya: GeoJSON.FeatureCollection;
-
+  let maskShape: GeoJSON.FeatureCollection;
   try {
-    const [sitesRes, boundaryRes, wardsRes, kenyaRes] = await Promise.all([
+    const [sitesRes, boundaryRes, wardsRes, maskRes] = await Promise.all([
       fetch('data/sites.geojson'),
       fetch('data/turkana-boundary.geojson'),
       fetch('data/turkana-wards.geojson'),
-      fetch('data/kenya-boundary.geojson'),
+      fetch('data/turkana-mask-shape.geojson'),
     ]);
 
-    for (const res of [sitesRes, boundaryRes, wardsRes, kenyaRes]) {
+    for (const res of [sitesRes, boundaryRes, wardsRes, maskRes]) {
       if (!res.ok) throw new Error(`Failed to load ${res.url}: ${res.status}`);
     }
 
-    [sites, boundary, wards, kenya] = (await Promise.all([
+    [sites, boundary, wards, maskShape] = (await Promise.all([
       sitesRes.json(),
       boundaryRes.json(),
       wardsRes.json(),
-      kenyaRes.json(),
+      maskRes.json(),
     ])) as [GeoJSON.FeatureCollection, GeoJSON.FeatureCollection, GeoJSON.FeatureCollection, GeoJSON.FeatureCollection];
   } catch (err) {
     console.error('Data load failed:', err);
@@ -278,7 +273,7 @@ map.on('load', async () => {
   sitesData = sites;
 
   /* Sources + layers */
-  addSourcesAndLayers(boundary, wards, kenya);
+  addSourcesAndLayers(boundary, wards, maskShape);
 
   /* ── click popup ────────────────────────────────────────────────── */
   map.on('click', 'sites-circles', (e) => {

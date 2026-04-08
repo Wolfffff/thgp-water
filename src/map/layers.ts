@@ -137,24 +137,6 @@ export function createInvertedMask(boundary: GeoJSON.FeatureCollection): GeoJSON
 }
 
 /**
- * Add layers to highlight Turkana County and dim the rest.
- */
-export function addKenyaMaskLayer(map: Map): void {
-  // Kenya outline (subtle at zoomed-in, visible zoomed-out)
-  if (map.getSource('kenya')) {
-    map.addLayer({
-      id: 'kenya-outline',
-      type: 'line',
-      source: 'kenya',
-      paint: {
-        'line-color': 'rgba(231, 117, 0, 0.3)',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 3, 1.5, 7, 0.5],
-      },
-    });
-  }
-}
-
-/**
  * Add a dark mask over everything outside Turkana County.
  * Call after adding the 'turkana-mask' source.
  */

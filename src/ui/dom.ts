@@ -283,7 +283,7 @@ function buildAboutModal(): HTMLElement {
     authorsList,
     el('h3', {}, 'Data'),
     el('p', {},
-      '152 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against the WHO Guidelines for Drinking-water Quality. Turkana County boundary from UN OCHA HDX (KEN COD-AB, 2019).',
+      '152 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against the WHO Guidelines for Drinking-water Quality. Turkana County boundary and ward outlines from IEBC, distributed via UN OCHA HDX (kenya-admin-level-3-wards).',
     ),
     el('h3', {}, 'Source Types'),
     sourceList,
@@ -387,13 +387,15 @@ function buildBasemapPicker(): HTMLElement {
   const layersLabel = el('span', { className: 'basemap-stack-label' }, 'Layers');
   picker.appendChild(layersLabel);
 
-  // Hidden select for controls.ts compatibility
+  // Hidden select for controls.ts compatibility — pre-set to satellite to
+  // match the active basemap on load.
   const hiddenSelect = el('select', { id: 'basemap-select', style: 'display:none' },
     el('option', { value: 'light' }, 'Light'),
     el('option', { value: 'dark' }, 'Dark'),
     el('option', { value: 'satellite' }, 'Satellite'),
     el('option', { value: 'terrain' }, 'Terrain'),
-  );
+  ) as HTMLSelectElement;
+  hiddenSelect.value = 'satellite';
   picker.appendChild(hiddenSelect);
 
   picker.addEventListener('click', (e) => {

@@ -49,9 +49,29 @@ export function initParameterSelect(
 // Basemap switcher
 // ---------------------------------------------------------------------------
 
+/**
+ * Hide our orange dashed county boundary on basemaps that already render
+ * their own administrative borders (Light/Dark CARTO Voyager use OSM data
+ * which disagrees slightly with our HDX polygon — overlapping the two
+ * looks misaligned). Show it on Satellite/Terrain where the basemap has
+ * no borders of its own.
+ */
+function applyBoundaryVisibilityForBasemap(map: Map, basemapKey: BasemapKey): void {
+  const basemapDrawsBorders = basemapKey === 'light' || basemapKey === 'dark';
+  const visibility = basemapDrawsBorders ? 'none' : 'visible';
+  if (map.getLayer('turkana-boundary')) {
+    map.setLayoutProperty('turkana-boundary', 'visibility', visibility);
+  }
+}
+
 export function initBasemapSelect(map: Map): void {
   const select = document.querySelector<HTMLSelectElement>('#basemap-select');
   if (!select) return;
+
+  // Apply for the initial basemap once layers are ready
+  map.once('idle', () => {
+    applyBoundaryVisibilityForBasemap(map, select.value as BasemapKey);
+  });
 
   select.addEventListener('change', () => {
     const key = select.value as BasemapKey;
@@ -79,6 +99,8 @@ export function initBasemapSelect(map: Map): void {
         source: 'basemap',
       }, firstLayerId);
     }
+
+    applyBoundaryVisibilityForBasemap(map, key);
   });
 }
 
