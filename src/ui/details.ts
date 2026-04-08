@@ -15,6 +15,9 @@ interface SiteValue {
 export type SiteClickHandler = (site: { name: string; lon: number; lat: number; wpNo: number | null }) => void;
 
 function fmt(v: number, integer = false): string {
+  // Lab convention: values below the detection limit come through as
+  // small negatives. Display as "<LOD" rather than a misleading negative.
+  if (!integer && v < 0) return '<LOD';
   if (integer || Number.isInteger(v)) return Math.round(v).toString();
   return v < 1 ? v.toFixed(2) : v < 100 ? v.toFixed(1) : v.toFixed(0);
 }

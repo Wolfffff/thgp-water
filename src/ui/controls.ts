@@ -734,6 +734,9 @@ export function updateParamRangeSlider(paramKey: string): void {
   _paramRange = [niceMin, niceMax];
 
   const fmt = (v: number) => {
+    // Lab convention: values below the detection limit are reported as
+    // small negatives. Display them as "<LOD" instead of "-0.1" etc.
+    if (v < 0) return '<LOD';
     if (Math.abs(v) >= 100) return v.toFixed(0);
     if (Math.abs(v) >= 1) return v.toFixed(1);
     return v.toFixed(2);

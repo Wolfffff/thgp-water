@@ -25,6 +25,9 @@ const PARAM_BY_KEY = new Map(PARAMETERS.map((p) => [p.key, p]));
  */
 export function formatValue(value: number | null, unit: string): string {
   if (value === null || value === undefined) return '\u2014';
+  // Lab convention: values below detection limit come through as small
+  // negatives. Display as "<LOD" rather than a misleading negative number.
+  if (value < 0) return '<LOD';
   let formatted: string;
   if (value < 1) {
     formatted = value.toFixed(2);
