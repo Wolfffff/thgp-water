@@ -1,5 +1,10 @@
 import type { Map } from 'maplibre-gl';
 import { getColorStops, NO_DATA_COLOR, SOURCE_TYPE_COLORS } from '../utils/colors';
+import { PARAMETERS } from '../data/parameters';
+
+const PARAM_HAS_THRESHOLD: Record<string, boolean> = Object.fromEntries(
+  PARAMETERS.map(p => [p.key, p.threshold !== null]),
+);
 
 // ---------------------------------------------------------------------------
 // Color expression builder
@@ -217,10 +222,15 @@ export function addWardLayer(map: Map): void {
 }
 
 /**
- * Update the sites circle layer and heatmap to use a different parameter's ratio.
+ * Update the sites circle layer and heatmap to use a different parameter.
+ * For threshold params, colors come from `ratio_X`. For null-threshold params,
+ * the synthesized `relmag_X` is used so the color ramp can still encode
+ * relative magnitude across the data range.
  */
 export function updateSitesParameter(map: Map, paramKey: string): void {
-  const property = `ratio_${paramKey}`;
+  const isExceed = paramKey === 'EXCEED';
+  const hasThreshold = isExceed || (PARAM_HAS_THRESHOLD[paramKey] ?? false);
+  const property = hasThreshold ? `ratio_${paramKey}` : `relmag_${paramKey}`;
   map.setPaintProperty('sites-circles', 'circle-color', ratioColorExpression(property));
 
   // Also update heatmap weight to match selected parameter

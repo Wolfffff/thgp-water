@@ -80,8 +80,8 @@ export const SOURCE_TYPE_SHAPES: Record<string, string> = {
 };
 
 export const SOURCE_TYPE_COLORS: Record<string, string> = {
-  'DBH solar': '#1b9e77',
-  'SBH pump': '#d95f02',
-  'OHD well': '#7570b3',
-  'Spring': '#e7298a',
+  'DBH solar': '#3e92cc',  // bright blue — deep boreholes
+  'SBH pump':  '#ffd166',  // warm yellow — shallow boreholes
+  'OHD well':  '#ef476f',  // coral pink — open dug wells
+  'Spring':    '#06d6a0',  // mint green — springs
 };

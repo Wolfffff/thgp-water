@@ -86,9 +86,12 @@ export function generatePopupHTML(
       // Threshold line position (1.0x ratio sits at 20% = 1/5)
       const thresholdPct = 20;
 
-      // Value label — only show the ratio multiplier when a real threshold exists.
+      // Value label — show the ratio multiplier when a real threshold exists
+      // and the ratio is meaningful. Most params store value/threshold so a
+      // sub-1× ratio is informative ("0.5x"), but pH stores 0 when within
+      // range, so suppress the meaningless "0.0x" in that case.
       const valueStr = formatValue(value, meta.unit);
-      const ratioStr = (hasThreshold && ratio !== null)
+      const ratioStr = (hasThreshold && ratio !== null && ratio > 0)
         ? ` (${ratio < 10 ? ratio.toFixed(1) : ratio.toFixed(0)}x)`
         : '';
       const displayValue = value !== null ? `${valueStr}${ratioStr}` : '\u2014';

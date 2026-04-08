@@ -40,6 +40,9 @@ import {
   initFilters,
   getActiveSourceTypes,
   tagSitesWithWards,
+  setSitesForSliders,
+  updateParamRangeSlider,
+  bindParamRangeApplyFn,
 } from './ui/controls';
 import { updateLegend, initSourceTypeLegend, showSourceTypeLegend } from './ui/legend';
 import { colorBySourceType } from './map/layers';
@@ -129,24 +132,25 @@ function flattenFeatureProperties(geojson: GeoJSON.FeatureCollection): void {
           ratios[key] = (params[key] as number) / threshold;
         }
       }
-      // Synthesize a relative-magnitude ratio for null-threshold params.
-      // Map (value / data-max) into the full 0–5 ratio range so the same
-      // color ramp + legend gradient is reused: lowest sample → green,
-      // highest sample → deep red.
+      // Synthesize a SEPARATE relative-magnitude value (relmag_X) for
+      // null-threshold params. Stored under its own key so it never pollutes
+      // ratios used for exceedance counting. Maps (value / data-max) into
+      // the 0–5 range so the existing color ramp is reused.
       for (const key of noThresholdKeys) {
         const v = params[key];
         const maxV = maxByKey[key];
         if (typeof v === 'number' && Number.isFinite(v) && maxV && maxV > 0) {
-          ratios[key] = (v / maxV) * 5;
+          props['relmag_' + key] = (v / maxV) * 5;
         }
       }
     }
 
-    // Count how many *real-threshold* exceedances this site has.
+    // Count real threshold exceedances. Only iterates over ratios — which
+    // by construction now contains only real-threshold values.
     let exceedCount = 0;
     for (const [key, val] of Object.entries(ratios)) {
       props['ratio_' + key] = val;
-      if (key in thresholds && typeof val === 'number' && val > 1.0) exceedCount++;
+      if (typeof val === 'number' && val > 1.0) exceedCount++;
     }
     if (params) {
       for (const [key, val] of Object.entries(params)) {
@@ -288,7 +292,7 @@ map.on('load', async () => {
 
     const html = generatePopupHTML(props as Record<string, any>, currentParam);
 
-    new maplibregl.Popup({ maxWidth: '360px', anchor: 'bottom', closeOnMove: false, closeOnClick: true })
+    new maplibregl.Popup({ maxWidth: '360px' })
       .setLngLat(coords)
       .setHTML(html)
       .addTo(map);
@@ -315,7 +319,7 @@ map.on('load', async () => {
       const props = parseClickProperties(match.properties as Record<string, unknown>);
       const html = generatePopupHTML(props as Record<string, any>, currentParam);
       setTimeout(() => {
-        new maplibregl.Popup({ maxWidth: '360px', anchor: 'bottom', closeOnMove: false, closeOnClick: true })
+        new maplibregl.Popup({ maxWidth: '360px' })
           .setLngLat([lon, lat])
           .setHTML(html)
           .addTo(map);
@@ -324,10 +328,12 @@ map.on('load', async () => {
   };
 
   /* ── UI controls ────────────────────────────────────────────────── */
+  setSitesForSliders(sites);
   initParameterSelect(map, (key: string) => {
     currentParam = key;
     updateSitesParameter(map, key);
     updateLegend(key);
+    updateParamRangeSlider(key);
     if (sitesData) updateStats(sitesData, key, zoomToSite);
   });
 
@@ -336,7 +342,7 @@ map.on('load', async () => {
   initExportButton(map);
 
   /* ── filters ─────────────────────────────────────────────────────── */
-  initFilters(map, wards, sites, () => {
+  const onAnyFilterChange = () => {
     if (sitesData) {
       const activeTypes = getActiveSourceTypes();
       const filtered: GeoJSON.FeatureCollection = {
@@ -348,7 +354,12 @@ map.on('load', async () => {
       };
       updateStats(filtered, currentParam, zoomToSite);
     }
-  });
+  };
+  const filtersApi = initFilters(map, wards, sites, onAnyFilterChange);
+  // The param-range slider needs to trigger the filter pipeline too
+  bindParamRangeApplyFn(filtersApi.applyFilter);
+  // Initial param slider setup for the default param
+  updateParamRangeSlider(currentParam);
   initAboutPanel();
 
   // Details modal

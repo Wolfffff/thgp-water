@@ -18,6 +18,7 @@ export function updateStats(
     container.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Select a parameter.</p>';
     return;
   }
+  const hasThreshold = isExceed || (param?.threshold != null);
 
   const features = geojson.features;
 
@@ -35,14 +36,11 @@ export function updateStats(
     if (!props) continue;
 
     if (isExceed) {
-      // Count mode: every site is "measured", exceedance = has at least 1 exceeded threshold
-      const ratios = props.ratios as Record<string, number | null> | undefined;
-      if (!ratios) continue;
+      // Count mode: use the canonical pre-counted exceedance total. Loops
+      // over ratios would also pick up the synthetic relmag values for
+      // null-threshold params, which we don't want here.
       measured++;
-      let siteExceedCount = 0;
-      for (const val of Object.values(ratios)) {
-        if (typeof val === 'number' && val > 1.0) siteExceedCount++;
-      }
+      const siteExceedCount = (props['param_EXCEED'] as number) ?? 0;
       const bhType = (props.bh_type as string) || 'Unknown';
       if (!byType[bhType]) byType[bhType] = { total: 0, exceed: 0 };
       byType[bhType].total++;
@@ -70,10 +68,15 @@ export function updateStats(
       if (!byType[bhType]) byType[bhType] = { total: 0, exceed: 0 };
       byType[bhType].total++;
 
-      const ratio = ratios?.[paramKey];
-      if (ratio != null && ratio > 1.0) {
-        exceeding++;
-        byType[bhType].exceed++;
+      // Only count exceedances when there's a real threshold; the synthetic
+      // relative-magnitude ratio used for null-threshold params would
+      // otherwise produce false "exceedances".
+      if (hasThreshold) {
+        const ratio = ratios?.[paramKey];
+        if (ratio != null && ratio > 1.0) {
+          exceeding++;
+          byType[bhType].exceed++;
+        }
       }
 
       if (maxValue === null || rawValue > maxValue) {
@@ -113,15 +116,24 @@ export function updateStats(
   measuredRow.textContent = `${measured} of ${totalSites} sites measured (${measuredPct}%)`;
   container.appendChild(measuredRow);
 
-  // Exceedance — highlighted if >0
-  const exceedRow = document.createElement('div');
-  exceedRow.className = 'stat-row';
-  if (exceeding > 0) {
-    exceedRow.innerHTML = `<span class="stat-exceed">${exceeding} exceed threshold (${exceedPct}%)</span>`;
+  // Exceedance — only meaningful when there's a real threshold
+  if (hasThreshold) {
+    const exceedRow = document.createElement('div');
+    exceedRow.className = 'stat-row';
+    if (exceeding > 0) {
+      exceedRow.innerHTML = `<span class="stat-exceed">${exceeding} exceed threshold (${exceedPct}%)</span>`;
+    } else {
+      exceedRow.textContent = 'None exceed threshold';
+    }
+    container.appendChild(exceedRow);
   } else {
-    exceedRow.textContent = 'None exceed threshold';
+    const noteRow = document.createElement('div');
+    noteRow.className = 'stat-row';
+    noteRow.style.color = 'var(--muted)';
+    noteRow.style.fontStyle = 'italic';
+    noteRow.textContent = 'No drinking-water threshold defined.';
+    container.appendChild(noteRow);
   }
-  container.appendChild(exceedRow);
 
   // By source type
   const sortedTypes = Object.entries(byType).sort(([, a], [, b]) => b.total - a.total);
@@ -132,10 +144,14 @@ export function updateStats(
     container.appendChild(typeHeader);
 
     for (const [type, counts] of sortedTypes) {
-      const pct = counts.total > 0 ? Math.round((counts.exceed / counts.total) * 100) : 0;
       const row = document.createElement('div');
       row.className = 'stat-row stat-row-type';
-      row.innerHTML = `<span class="stat-type-name">${type}</span> <span class="stat-type-val">${counts.exceed}/${counts.total} (${pct}%)</span>`;
+      if (hasThreshold) {
+        const pct = counts.total > 0 ? Math.round((counts.exceed / counts.total) * 100) : 0;
+        row.innerHTML = `<span class="stat-type-name">${type}</span> <span class="stat-type-val">${counts.exceed}/${counts.total} (${pct}%)</span>`;
+      } else {
+        row.innerHTML = `<span class="stat-type-name">${type}</span> <span class="stat-type-val">${counts.total}</span>`;
+      }
       container.appendChild(row);
     }
   }

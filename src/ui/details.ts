@@ -38,12 +38,9 @@ function collectValues(
     const wpNo = typeof props.wp_no === 'number' ? props.wp_no : (props.wp_no != null ? Number(props.wp_no) : null);
 
     if (isExceed) {
-      const ratios = props.ratios as Record<string, number | null> | undefined;
-      if (!ratios) continue;
-      let count = 0;
-      for (const v of Object.values(ratios)) {
-        if (typeof v === 'number' && v > 1.0) count++;
-      }
+      // Use the canonical pre-counted exceedance total instead of looping
+      // over ratios (which would inadvertently include synthetic relmag).
+      const count = (props['param_EXCEED'] as number) ?? 0;
       values.push({ value: count, ratio: Math.min(count, 5), name: props.name, type: props.bh_type, wpNo, lon, lat });
     } else {
       const params = props.params as Record<string, number | null> | undefined;

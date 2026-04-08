@@ -175,6 +175,56 @@
 }
 .filter-action-btn:hover { color: var(--orange); border-color: var(--orange); }
 
+/* Dual-range slider — two overlapping <input type="range"> elements */
+.range-slider {
+  position: relative;
+  height: 36px;
+  margin-top: 8px;
+  padding: 0 6px;
+}
+.range-slider-labels {
+  display: flex; justify-content: space-between;
+  font: 500 0.66rem/1 var(--sans); color: var(--muted);
+  margin-bottom: 6px;
+}
+.range-slider-label-min { color: var(--text); }
+.range-slider-label-max { color: var(--text); }
+.range-slider-track {
+  position: absolute; left: 6px; right: 6px; top: 22px;
+  height: 4px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 2px;
+}
+.range-slider-fill {
+  position: absolute; top: 0; bottom: 0;
+  background: var(--orange);
+  border-radius: 2px;
+}
+.range-slider-input {
+  position: absolute; left: 6px; right: 6px; top: 18px;
+  width: calc(100% - 12px); height: 12px;
+  background: transparent;
+  -webkit-appearance: none; appearance: none;
+  pointer-events: none;
+}
+.range-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--orange); border: 2px solid #fff;
+  cursor: grab; pointer-events: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  transition: transform 0.1s ease;
+}
+.range-slider-input::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.range-slider-input::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.2); }
+.range-slider-input::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--orange); border: 2px solid #fff;
+  cursor: grab; pointer-events: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.range-slider-input::-webkit-slider-runnable-track { background: transparent; border: none; }
+.range-slider-input::-moz-range-track { background: transparent; border: none; }
+
 .filter-checks { display: flex; flex-direction: column; gap: 1px; }
 .filter-checks--scroll {
   max-height: 200px; overflow-y: auto;

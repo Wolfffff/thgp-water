@@ -338,7 +338,14 @@ const SOURCE_TYPE_CHECKBOX_MAP: Record<string, string> = {
 let _activeSourceTypes: string[] = Object.values(SOURCE_TYPE_CHECKBOX_MAP);
 let _activeWards: string[] = [];
 let _allWardNames: string[] = [];
-let _alertsMode: 'any' | 'good' | number = 'any';
+let _alertsMin: number = 0;
+let _alertsMax: number = 0;
+let _alertsMaxCap: number = 0;
+let _paramMin: number = 0;
+let _paramMax: number = 0;
+let _paramRange: [number, number] = [0, 0];
+let _paramKey: string = '';
+let _sitesData: GeoJSON.FeatureCollection | null = null;
 
 export function getActiveSourceTypes(): string[] {
   return _activeSourceTypes;
@@ -348,8 +355,12 @@ export function getActiveWards(): string[] {
   return _activeWards;
 }
 
-export function getAlertsMode(): 'any' | 'good' | number {
-  return _alertsMode;
+export function getAlertsRange(): [number, number] {
+  return [_alertsMin, _alertsMax];
+}
+
+export function getParamRange(): [number, number] {
+  return _paramRange;
 }
 
 /**
@@ -426,7 +437,7 @@ export function initFilters(
   wardsData: GeoJSON.FeatureCollection,
   sitesData: GeoJSON.FeatureCollection,
   onFilterChange: () => void,
-): void {
+): { applyFilter: () => void } {
   // Build a set of ward names that actually contain at least one site
   const wardsWithSites = new Set<string>();
   for (const site of sitesData.features) {
@@ -493,12 +504,6 @@ export function initFilters(
       if (cb.checked && cb.dataset.wardName) _activeWards.push(cb.dataset.wardName);
     });
 
-    const alertsSelect = document.querySelector<HTMLSelectElement>('#alerts-select');
-    const alertsVal = alertsSelect?.value ?? 'any';
-    if (alertsVal === 'any') _alertsMode = 'any';
-    else if (alertsVal === 'good') _alertsMode = 'good';
-    else _alertsMode = parseInt(alertsVal, 10) || 0;
-
     const filter: any[] = ['all'];
 
     // Source type filter
@@ -511,11 +516,23 @@ export function initFilters(
       filter.push(['in', ['get', 'ward'], ['literal', _activeWards]]);
     }
 
-    // Alerts filter (uses pre-computed param_EXCEED)
-    if (_alertsMode === 'good') {
-      filter.push(['==', ['coalesce', ['get', 'param_EXCEED'], 0], 0]);
-    } else if (typeof _alertsMode === 'number' && _alertsMode > 0) {
-      filter.push(['>=', ['coalesce', ['get', 'param_EXCEED'], 0], _alertsMode]);
+    // Alerts range filter (using pre-computed param_EXCEED)
+    if (_alertsMin > 0 || _alertsMax < _alertsMaxCap) {
+      filter.push(['>=', ['coalesce', ['get', 'param_EXCEED'], 0], _alertsMin]);
+      filter.push(['<=', ['coalesce', ['get', 'param_EXCEED'], 0], _alertsMax]);
+    }
+
+    // Focal-parameter value range filter — only when not the EXCEED pseudo-param
+    // and the user has narrowed the range from the data extent.
+    if (_paramKey && _paramKey !== 'EXCEED') {
+      const [lo, hi] = _paramRange;
+      if (lo > _paramMin || hi < _paramMax) {
+        const propName = 'param_' + _paramKey;
+        // Sites that don't have this param (null) should be excluded when filtering.
+        filter.push(['!=', ['get', propName], null]);
+        filter.push(['>=', ['get', propName], lo]);
+        filter.push(['<=', ['get', propName], hi]);
+      }
     }
 
     const filterExpr = filter.length > 1 ? (filter as maplibregl.FilterSpecification) : null;
@@ -602,8 +619,193 @@ export function initFilters(
     });
   });
 
-  // Initial summary text
+  /* ── Alerts dual-range slider ─────────────────────────────────────── */
+  // Compute the maximum exceedance count across all sites for the slider's
+  // upper bound — this is the cap, so the slider can never exceed it.
+  let maxExceedances = 0;
+  for (const f of sitesData.features) {
+    const c = (f.properties as any)?.param_EXCEED;
+    if (typeof c === 'number' && c > maxExceedances) maxExceedances = c;
+  }
+  _alertsMaxCap = maxExceedances;
+  _alertsMin = 0;
+  _alertsMax = maxExceedances;
+  setupRangeSlider({
+    containerId: 'alerts-range',
+    minInputId: 'alerts-range-min',
+    maxInputId: 'alerts-range-max',
+    minLabelId: 'alerts-range-min-label',
+    maxLabelId: 'alerts-range-max-label',
+    fillId: 'alerts-range-fill',
+    min: 0,
+    max: maxExceedances,
+    initialMin: 0,
+    initialMax: maxExceedances,
+    step: 1,
+    format: (v) => String(Math.round(v)),
+    onChange: (lo, hi) => {
+      _alertsMin = lo;
+      _alertsMax = hi;
+      applyFilter();
+    },
+  });
+
+  // Initial summary text + filter pass
   applyFilter();
+
+  return { applyFilter };
+}
+
+/* ── Param value range slider — re-initialised when the focal param changes */
+
+let _paramSliderApply: (() => void) | null = null;
+
+export function updateParamRangeSlider(paramKey: string): void {
+  _paramKey = paramKey;
+  const group = document.querySelector<HTMLElement>('#param-range-group');
+  const label = document.querySelector<HTMLElement>('#param-range-label');
+  if (!group) return;
+
+  if (paramKey === 'EXCEED' || !_sitesData) {
+    group.style.display = 'none';
+    _paramRange = [0, 0];
+    _paramMin = 0;
+    _paramMax = 0;
+    if (_paramSliderApply) _paramSliderApply();
+    return;
+  }
+
+  // Compute min/max for this parameter across all sites
+  let lo = Infinity, hi = -Infinity;
+  for (const f of _sitesData.features) {
+    const v = (f.properties as any)?.['param_' + paramKey];
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+  }
+  if (!Number.isFinite(lo) || !Number.isFinite(hi) || lo === hi) {
+    group.style.display = 'none';
+    _paramRange = [0, 0];
+    _paramMin = 0;
+    _paramMax = 0;
+    if (_paramSliderApply) _paramSliderApply();
+    return;
+  }
+
+  group.style.display = '';
+  // Update the label with the param's display name + unit
+  const paramMeta = SELECTABLE_PARAMETERS.find(p => p.key === paramKey);
+  if (label && paramMeta) {
+    const unitStr = paramMeta.unit ? ` (${paramMeta.unit})` : '';
+    label.textContent = `${paramMeta.displayName}${unitStr}`;
+  }
+
+  // Pick a reasonable step + extend bounds to clean multiples so the actual
+  // data max is always inside the slider range.
+  const dataRange = hi - lo;
+  const step = dataRange > 100 ? 1 : dataRange > 10 ? 0.1 : 0.01;
+  const niceMin = Math.floor(lo / step) * step;
+  const niceMax = Math.ceil(hi / step) * step;
+  _paramMin = niceMin;
+  _paramMax = niceMax;
+  _paramRange = [niceMin, niceMax];
+
+  const fmt = (v: number) => {
+    if (Math.abs(v) >= 100) return v.toFixed(0);
+    if (Math.abs(v) >= 1) return v.toFixed(1);
+    return v.toFixed(2);
+  };
+
+  setupRangeSlider({
+    containerId: 'param-range',
+    minInputId: 'param-range-min',
+    maxInputId: 'param-range-max',
+    minLabelId: 'param-range-min-label',
+    maxLabelId: 'param-range-max-label',
+    fillId: 'param-range-fill',
+    min: niceMin,
+    max: niceMax,
+    initialMin: niceMin,
+    initialMax: niceMax,
+    step,
+    format: fmt,
+    onChange: (a, b) => {
+      _paramRange = [a, b];
+      if (_paramSliderApply) _paramSliderApply();
+    },
+  });
+}
+
+/** Wire the param-range slider to the filter callback in initFilters. */
+export function bindParamRangeApplyFn(fn: () => void): void {
+  _paramSliderApply = fn;
+}
+
+/** Stash the sites collection so the slider can recompute its bounds. */
+export function setSitesForSliders(sites: GeoJSON.FeatureCollection): void {
+  _sitesData = sites;
+}
+
+/* ── Dual-range slider helper ─────────────────────────────────────── */
+
+interface RangeSliderOptions {
+  containerId: string;
+  minInputId: string;
+  maxInputId: string;
+  minLabelId: string;
+  maxLabelId: string;
+  fillId: string;
+  min: number;
+  max: number;
+  initialMin: number;
+  initialMax: number;
+  step: number;
+  format: (v: number) => string;
+  onChange: (lo: number, hi: number) => void;
+}
+
+function setupRangeSlider(opts: RangeSliderOptions): void {
+  const minInput = document.querySelector<HTMLInputElement>(`#${opts.minInputId}`);
+  const maxInput = document.querySelector<HTMLInputElement>(`#${opts.maxInputId}`);
+  const minLabel = document.querySelector<HTMLElement>(`#${opts.minLabelId}`);
+  const maxLabel = document.querySelector<HTMLElement>(`#${opts.maxLabelId}`);
+  const fill = document.querySelector<HTMLElement>(`#${opts.fillId}`);
+  if (!minInput || !maxInput || !minLabel || !maxLabel || !fill) return;
+
+  // Configure the inputs
+  for (const input of [minInput, maxInput]) {
+    input.min = String(opts.min);
+    input.max = String(opts.max);
+    input.step = String(opts.step);
+  }
+  minInput.value = String(opts.initialMin);
+  maxInput.value = String(opts.initialMax);
+
+  const update = () => {
+    let lo = parseFloat(minInput.value);
+    let hi = parseFloat(maxInput.value);
+    // Enforce ordering
+    if (lo > hi) {
+      // Whichever was just moved past the other — swap visually
+      if (document.activeElement === minInput) lo = hi;
+      else hi = lo;
+      minInput.value = String(lo);
+      maxInput.value = String(hi);
+    }
+    minLabel.textContent = opts.format(lo);
+    maxLabel.textContent = opts.format(hi);
+    const span = opts.max - opts.min || 1;
+    const lpct = ((lo - opts.min) / span) * 100;
+    const rpct = ((hi - opts.min) / span) * 100;
+    fill.style.left = `${lpct}%`;
+    fill.style.width = `${rpct - lpct}%`;
+    opts.onChange(lo, hi);
+  };
+
+  minInput.oninput = update;
+  maxInput.oninput = update;
+  update();
 }
 
 // ---------------------------------------------------------------------------
