@@ -42,7 +42,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Fluoride Contamination',
-    text: 'Fluoride is the most pervasive contaminant — nearly half of all boreholes exceed the 1.5 ppm threshold. Here, Nadwat Main BH measures 12.8 ppm, over 8 times the safe limit.',
+    text: 'Fluoride is the most pervasive contaminant — up to 40% of boreholes exceed the 1.5 ppm threshold. Here, Nadwat Main BH measures 12.8 ppm, over 8 times the safe limit.',
     action: (map, setParam) => {
       setParam?.('F');
       // Zoom to Nadwat Main BH (12.8 ppm F, 8.5x threshold)
@@ -65,7 +65,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Choose a Parameter',
-    text: 'Use the sidebar to switch between 29 water quality parameters, or view the Alerts mode showing how many thresholds each site exceeds.',
+    text: 'Use the sidebar to switch between 48 physical-chemical parameters, or view the Alerts mode showing how many thresholds each site exceeds.',
     highlight: '#param-section',
     action: () => {
       document.querySelector('#sidebar')?.classList.remove('sidebar--collapsed');

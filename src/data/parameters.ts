@@ -39,7 +39,7 @@ export const PARAMETERS: ParameterMeta[] = [
   { key: 'Zn',    displayName: 'Zinc (Zn)',                        unit: 'ppb', csvColumn: 'Zn (ppb)',        threshold: 5000,   thresholdUnit: 'ppb', thresholdBody: 'KS',    category: 'trace'         },
 
   // --- No threshold (informational only — still selectable in the UI) ---
-  { key: 'Atm Pressure', displayName: 'Atmospheric Pressure',     unit: 'mbar',  csvColumn: 'Atm Pressure',   threshold: null, thresholdUnit: null, thresholdBody: null, category: 'physical' },
+  { key: 'Atm Pressure', displayName: 'Atmospheric Pressure',     unit: 'mmHg',  csvColumn: 'Atm Pressure',   threshold: null, thresholdUnit: null, thresholdBody: null, category: 'physical' },
   { key: 'Be',    displayName: 'Beryllium (Be)',                   unit: 'ppb',   csvColumn: 'Be (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
   { key: 'Bi',    displayName: 'Bismuth (Bi)',                     unit: 'ppb',   csvColumn: 'Bi (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
   { key: 'Co',    displayName: 'Cobalt (Co)',                      unit: 'ppb',   csvColumn: 'Co (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
@@ -51,9 +51,9 @@ export const PARAMETERS: ParameterMeta[] = [
   { key: 'Mo',    displayName: 'Molybdenum (Mo)',                  unit: 'ppb',   csvColumn: 'Mo (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
   { key: 'Rb',    displayName: 'Rubidium (Rb)',                    unit: 'ppb',   csvColumn: 'Rb (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
   { key: 'Re',    displayName: 'Rhenium (Re)',                     unit: 'ppb',   csvColumn: 'Re (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
-  { key: 'S',     displayName: 'Sulfur (S)',                       unit: 'ppb',   csvColumn: 'S (ppb)',        threshold: null, thresholdUnit: null, thresholdBody: null, category: 'major'    },
+  { key: 'S',     displayName: 'Sulfur (S)',                       unit: 'ppm',   csvColumn: 'S (ppm)',        threshold: null, thresholdUnit: null, thresholdBody: null, category: 'major'    },
   { key: 'Sc',    displayName: 'Scandium (Sc)',                    unit: 'ppb',   csvColumn: 'Sc (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
-  { key: 'Si',    displayName: 'Silicon (Si)',                     unit: 'ppb',   csvColumn: 'Si (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
+  { key: 'Si',    displayName: 'Silicon (Si)',                     unit: 'ppm',   csvColumn: 'Si (ppm)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },
   { key: 'SiO2',  displayName: 'Silica (SiO\u2082)',               unit: 'ppm',   csvColumn: 'SiO2 (ppm)',     threshold: null, thresholdUnit: null, thresholdBody: null, category: 'physical' },
   { key: 'SPC',   displayName: 'Specific Conductance',             unit: 'µS/cm', csvColumn: 'SPC (uS/cm)',    threshold: null, thresholdUnit: null, thresholdBody: null, category: 'physical' },
   { key: 'Sr',    displayName: 'Strontium (Sr)',                   unit: 'ppb',   csvColumn: 'Sr (ppb)',       threshold: null, thresholdUnit: null, thresholdBody: null, category: 'trace'    },

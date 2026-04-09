@@ -34,7 +34,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export function buildIntroOverlay(): HTMLElement {
   const statData: [string, string][] = [
     ['153', 'Sites'],
-    ['52', 'Parameters'],
+    ['48', 'Parameters'],
     ['23', 'Wards'],
   ];
 
@@ -242,7 +242,7 @@ function buildAboutModal(): HTMLElement {
   const authorsData: [string, string, string][] = [
     ['Fred Omengo', 'Lead Researcher', 'Princeton University \u00B7 Turkana Basin Institute \u00B7 Wildlife Research and Training Institute'],
     ['Sospecter Njeru', 'Co-Investigator', 'Kenya Medical Research Institute'],
-    ['Julien Ayroles', 'Principal Investigator', 'UC Berkeley \u00B7 Turkana Basin Institute'],
+    ['Julien Ayroles', 'Principal Investigator', 'UC Berkeley \u00B7 Turkana Basin Institute \u00B7 KEMRI'],
     ['Elizabeth Niespolo', 'Corresponding Author', 'Princeton University \u00B7 fo5058@princeton.edu'],
   ];
 
@@ -277,13 +277,13 @@ function buildAboutModal(): HTMLElement {
     el('button', { id: 'about-close', className: 'close-btn', 'aria-label': 'Close' }, '\u00D7'),
     el('h2', {}, 'About This Map'),
     el('p', { className: 'about-description' },
-      'Interactive map analyzing 153 water sources across Turkana County, Kenya for 52 physical-chemical parameters.',
+      'Interactive map analyzing 153 water sources across Turkana County, Kenya for 48 physical-chemical parameters and 4 field measurements.',
     ),
     el('h3', {}, 'Authors'),
     authorsList,
     el('h3', {}, 'Data'),
     el('p', {},
-      '153 water sources sampled across 23 of 30 wards in Turkana County. Parameters compared against the WHO Guidelines for Drinking-water Quality. Turkana County boundary and ward outlines from IEBC, distributed via UN OCHA HDX (kenya-admin-level-3-wards).',
+      '153 water sources sampled across 23 of 30 wards in Turkana County. 48 physical-chemical parameters compared against WHO Guidelines for Drinking-water Quality and Kenya Bureau of Standards KS 459-1:2007. Turkana County boundary and ward outlines from IEBC, distributed via UN OCHA HDX (kenya-admin-level-3-wards).',
     ),
     el('h3', {}, 'Source Types'),
     sourceList,
