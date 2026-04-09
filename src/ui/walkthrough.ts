@@ -42,21 +42,21 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Fluoride Contamination',
-    text: 'Fluoride is the most pervasive contaminant — up to 40% of boreholes exceed the 1.5 ppm threshold. Here, Nadwat Main BH measures 12.8 ppm, over 8 times the safe limit.',
+    text: 'Fluoride is the most pervasive contaminant — up to 40% of sampled sites exceed the 1.5 mg/L threshold. The highest recorded value is 26 mg/L at Lokamarinyang Spring in Kibish ward, over 17 times the safe limit.',
     action: (map, setParam) => {
       setParam?.('F');
-      // Zoom to Nadwat Main BH (12.8 ppm F, 8.5x threshold)
-      map.flyTo({ center: [35.15, 3.56], zoom: 12, duration: 1800 });
+      // Zoom to Lokamarinyang Spring — highest F in the dataset (26.7 ppm, ~17.8× threshold)
+      map.flyTo({ center: [35.61, 5.03], zoom: 12, duration: 1800 });
       // After fly settles, open a popup on the worst site to highlight it
       setTimeout(() => {
         // Only show if still on this step (user hasn't advanced)
         if (!document.querySelector('.tour-card')) return;
         new maplibregl.Popup({ maxWidth: '240px', closeOnClick: true, closeButton: false })
-          .setLngLat([35.14829, 3.55873])
+          .setLngLat([35.61027, 5.03251])
           .setHTML(`<div style="padding:8px;font-family:var(--sans);color:var(--text)">
-            <strong style="color:#fff">Nadwat Main BH</strong><br>
-            <span style="color:var(--orange);font-size:1.1rem;font-weight:600">12.8 ppm F</span><br>
-            <span style="color:var(--muted);font-size:0.75rem">8.5× WHO/KS threshold</span>
+            <strong style="color:#fff">Lokamarinyang Spring</strong><br>
+            <span style="color:var(--orange);font-size:1.1rem;font-weight:600">26.7 ppm F</span><br>
+            <span style="color:var(--muted);font-size:0.75rem">17.8× WHO/KS threshold</span>
           </div>`)
           .addTo(map);
       }, 2200);
@@ -65,7 +65,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     title: 'Choose a Parameter',
-    text: 'Use the sidebar to switch between 48 physical-chemical parameters, or view the Alerts mode showing how many thresholds each site exceeds.',
+    text: 'Use the sidebar to switch between 52 water quality and field parameters, or view the Alerts mode showing how many thresholds each site exceeds.',
     highlight: '#param-section',
     action: () => {
       document.querySelector('#sidebar')?.classList.remove('sidebar--collapsed');

@@ -34,7 +34,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export function buildIntroOverlay(): HTMLElement {
   const statData: [string, string][] = [
     ['153', 'Sites'],
-    ['48', 'Parameters'],
+    ['52', 'Parameters'],
     ['23', 'Wards'],
   ];
 
@@ -240,10 +240,10 @@ function buildInfoButton(): HTMLElement {
 function buildAboutModal(): HTMLElement {
   /* Authors */
   const authorsData: [string, string, string][] = [
-    ['Fred Omengo', 'Lead Researcher', 'Princeton University \u00B7 Turkana Basin Institute \u00B7 Wildlife Research and Training Institute'],
-    ['Sospecter Njeru', 'Co-Investigator', 'Kenya Medical Research Institute'],
-    ['Julien Ayroles', 'Principal Investigator', 'UC Berkeley \u00B7 Turkana Basin Institute \u00B7 KEMRI'],
-    ['Elizabeth Niespolo', 'Corresponding Author', 'Princeton University \u00B7 fo5058@princeton.edu'],
+    ['Fred Omengo', 'Principal Investigator', 'Princeton University \u00B7 Turkana Basin Institute \u00B7 Wildlife Research and Training Institute'],
+    ['Sospecter Njeru', 'Co-Investigator', 'Center for Community Driven Research, KEMRI'],
+    ['Julien Ayroles', 'Senior Author', 'UC Berkeley \u00B7 Turkana Basin Institute \u00B7 KEMRI'],
+    ['Elizabeth Niespolo', 'Corresponding Author', 'Princeton University'],
   ];
 
   const authorsList = el('div', { className: 'authors-list' },
@@ -256,12 +256,12 @@ function buildAboutModal(): HTMLElement {
     ),
   );
 
-  /* Source types */
+  /* Source types — colors match SOURCE_TYPE_COLORS, counts from the dataset */
   const sourceTypes: [string, string][] = [
-    ['#1b9e77', 'Deep Borehole, Solar (DBH solar) \u2014 n=90'],
-    ['#d95f02', 'Shallow Borehole, Hand Pump (SBH pump) \u2014 n=38'],
-    ['#7570b3', 'Open Hand-Dug Well (OHD well) \u2014 n=21'],
-    ['#e7298a', 'Natural Spring \u2014 n=3'],
+    ['#3e92cc', 'Deep Borehole, Solar (DBH solar) \u2014 n=90'],
+    ['#ffd166', 'Shallow Borehole, Hand Pump (SBH pump) \u2014 n=38'],
+    ['#ef476f', 'Open Hand-Dug Well (OHD well) \u2014 n=21'],
+    ['#06d6a0', 'Natural Spring \u2014 n=4'],
   ];
 
   const sourceList = el('ul', { className: 'source-types-list' },
@@ -277,13 +277,13 @@ function buildAboutModal(): HTMLElement {
     el('button', { id: 'about-close', className: 'close-btn', 'aria-label': 'Close' }, '\u00D7'),
     el('h2', {}, 'About This Map'),
     el('p', { className: 'about-description' },
-      'Interactive map analyzing 153 water sources across Turkana County, Kenya for 48 physical-chemical parameters and 4 field measurements.',
+      'Interactive map analyzing 153 water sources across Turkana County, Kenya for 52 physical-chemical and field parameters.',
     ),
     el('h3', {}, 'Authors'),
     authorsList,
     el('h3', {}, 'Data'),
     el('p', {},
-      '153 water sources sampled across 23 of 30 wards in Turkana County. 48 physical-chemical parameters compared against WHO Guidelines for Drinking-water Quality and Kenya Bureau of Standards KS 459-1:2007. Turkana County boundary and ward outlines from IEBC, distributed via UN OCHA HDX (kenya-admin-level-3-wards).',
+      '153 water sources sampled across 23 of 30 wards in Turkana County. 52 parameters measured (48 lab-analyzed + 4 field). Thresholds compared against WHO Guidelines for Drinking-water Quality and Kenya Bureau of Standards KS 459-1:2007. Turkana County boundary and ward outlines from IEBC, distributed via UN OCHA HDX (kenya-admin-level-3-wards).',
     ),
     el('h3', {}, 'Source Types'),
     sourceList,
@@ -305,7 +305,7 @@ function buildWalkthrough(): HTMLElement {
     {
       step: '1', target: '#param-select', position: 'left',
       title: 'Select a Parameter',
-      text: 'Choose from 29 water quality parameters. Colors show how each site compares to WHO/KS drinking water thresholds.',
+      text: 'Choose from 52 water quality and field parameters. Colors show how each site compares to WHO/KS drinking water thresholds.',
       btnLabel: 'Next', progress: '1 / 4',
     },
     {
